@@ -1,6 +1,6 @@
 # `<PROJECT_NAME>` — kickoff
 
-You are the first Claude Code session opened on this project. This document tells you what's already been decided, what hasn't, and what you should do first. **Read this before doing anything else.**
+You are the first AI-coding-agent session opened on this project (Claude Code, Pi, or any other AGENTS-compatible harness). This document tells you what's already been decided, what hasn't, and what you should do first. **Read this before doing anything else.**
 
 > **This is a starter-template file.** Once Phase 1 (stack-selection ADRs) and Phase 2 (repo bootstrap) are complete, delete this file — its only purpose is to bridge the gap from "starter scaffolding" to "first real work."
 
@@ -17,18 +17,20 @@ Full product context: read **`PROJECT.md`** next.
 ## Project state when you opened this
 
 This repo was scaffolded from
-[`claude-project-starter`](https://github.com/gorillabiscuit/claude-project-starter)
+[`ai-assisted-project-starter`](https://github.com/gorillabiscuit/ai-assisted-project-starter)
 — the monorepo template that ships the working contract, ADR pattern,
-AI-attribution scanner, and pre-PR review flow already wired up.
+AI-attribution scanner, North Star kickoff ritual, and pre-PR review flow
+already wired up for both Claude Code and Pi.
 
 The starter gave you:
 
-- `CLAUDE.md` (working contract — read end-to-end)
-- `.claude/commands/pre-pr.md` (`/pre-pr` slash command)
+- `AGENTS.md` (working contract — read end-to-end; `CLAUDE.md` is a symlink to it)
+- `docs/north-star-kickoff.md` + `/north-star` command in both harnesses
+- `.claude/commands/pre-pr.md` + `.pi/prompts/pre-pr.md` (`/pre-pr` review)
 - `scripts/scan-ai-attribution.sh` + `.husky/pre-push` (AI-attribution gate)
 - `docs/decisions/` (ADR pattern + `_template.md`)
 - `docs/runbooks/` (per-vendor incident reference pattern)
-- `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons
+- `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons (the last with a `## North Star` block to be filled on kickoff)
 - TypeScript strict baseline, ESLint flat config, Prettier, Vitest, husky+lint-staged
 
 No application code exists yet. The artefacts you see are the **design + contract scaffolding** for you to build on.
@@ -38,6 +40,16 @@ No application code exists yet. The artefacts you see are the **design + contrac
 ## Phase 1: your starting point
 
 Walk through these in order. **Each is a deliberate "decide before you build" gate.**
+
+### 1.0 North Star
+
+Run the kickoff ritual in `docs/north-star-kickoff.md` (or invoke `/north-star`).
+Interview the human one question at a time. The output is three lines written
+into `PROJECT.md`'s `## North Star` block: the metric, the "what this means
+for what we build" sentence, and the boundary. Do this BEFORE filling
+`PROJECT.md`'s product-brief sections — the rest of the brief gets sharper
+once the North Star is fixed, and per `AGENTS.md §4` no other non-trivial
+task may proceed until the placeholders are replaced.
 
 ### 1.1 Product brief
 
@@ -81,11 +93,11 @@ For each: write a real ADR using `docs/decisions/_template.md` as `000X-<slug>.m
 
 ### 1.4 Update the working contract
 
-Now that you have decisions, fix `CLAUDE.md` §1 (project identity) and §2 (architectural invariants) to match. Add any project-specific banned patterns (§3) and stop-and-ask items (§4) that the decisions imply.
+Now that you have decisions, fix `AGENTS.md` §1 (project identity) and §2 (architectural invariants) to match. Add any project-specific banned patterns (§3) and stop-and-ask items (§4) that the decisions imply.
 
 ### 1.5 Roadmap
 
-Open `docs/ROADMAP.md` and lay out the milestones — sequenced view of the work, complementing PROJECT.md's contract.
+Open `docs/ROADMAP.md` and lay out the milestones — sequenced view of the work, complementing PROJECT.md's contract. **Every milestone entry needs a `North Star linkage:` line** stating how its outcome moves the metric in PROJECT.md's `## North Star`. If a milestone can't be linked, it's the wrong milestone.
 
 ---
 
@@ -94,7 +106,7 @@ Open `docs/ROADMAP.md` and lay out the milestones — sequenced view of the work
 After Phase 1 ADRs are accepted:
 
 1. Install dependencies for whatever stack you decided on.
-2. Stand up the first app (`apps/web/` is pre-created as an empty folder with a `CLAUDE.md` overlay).
+2. Stand up the first app (`apps/web/` is pre-created as an empty folder with an `AGENTS.md` overlay; `CLAUDE.md` symlinks to it).
 3. Run `pnpm preflight` — should pass on the empty scaffolding.
 4. First "real" feature commit lands.
 

@@ -1,8 +1,8 @@
 ---
-description: Run the pre-PR review per CLAUDE.md §7
+description: Run the pre-PR review per AGENTS.md §7
 ---
 
-You are running the pre-PR review per `CLAUDE.md §7`. Do all of the following inline. Do not ask the human to type commands or run scripts — you have Bash access; run things yourself.
+You are running the pre-PR review per `AGENTS.md §7`. Do all of the following inline. Do not ask the human to type commands or run scripts — you have Bash access; run things yourself.
 
 ## Step 1 — Run the gates
 
@@ -18,7 +18,7 @@ If anything fails: STOP. Surface the failure to the human, fix it, then re-run f
 
 ## Step 2 — Walk the diff
 
-Run `git diff origin/main...HEAD`. Tag every chunk: Scaffolding / Decision / Logic / External / Security per `CLAUDE.md §6`. Apply §6.1 escalation (when in doubt, classify upward) and §6.2 acknowledgement (the human must explicitly acknowledge each Security or External chunk before commit).
+Run `git diff origin/main...HEAD`. Tag every chunk: Scaffolding / Decision / Logic / External / Security per `AGENTS.md §6`. Apply §6.1 escalation (when in doubt, classify upward) and §6.2 acknowledgement (the human must explicitly acknowledge each Security or External chunk before commit).
 
 ## Step 3 — Pessimistic meta-check (fresh sub-agent)
 
@@ -26,9 +26,9 @@ Spawn an Explore sub-agent. The sub-agent must NOT see this conversation's imple
 
 Brief the sub-agent:
 
-> Read `CLAUDE.md`, the relevant ADRs in `docs/decisions/`, the per-package `CLAUDE.md` files for any package this PR touches, and the current `git diff origin/main...HEAD`.
+> Read `AGENTS.md`, the relevant ADRs in `docs/decisions/`, the per-package `AGENTS.md` files for any package this PR touches, and the current `git diff origin/main...HEAD`.
 >
-> Look for: rule violations (banned patterns from §3, missing ADRs for architectural choices, missing `DEPS.md` entries for new deps, cross-package import violations from the per-package CLAUDE.md files, any moat-package purity rules), category/naming/scope mismatches, brittleness (hardcoded dates, magic strings, paths that age badly), documentation drift (broken cross-references), things that pass the gates but a senior reviewer would flag.
+> Look for: rule violations (banned patterns from §3, missing ADRs for architectural choices, missing `DEPS.md` entries for new deps, cross-package import violations from the per-package AGENTS.md files, any moat-package purity rules), category/naming/scope mismatches, brittleness (hardcoded dates, magic strings, paths that age badly), documentation drift (broken cross-references), things that pass the gates but a senior reviewer would flag.
 >
 > Bias toward suspicion. **Assume at least three issues missed**; if you find fewer than three, look harder before concluding.
 >
@@ -52,7 +52,7 @@ Read the ticket (Linear / GitHub issue / wherever). For each acceptance-criterio
 
 `git log --oneline origin/main..HEAD`. For each commit:
 
-- One logical change? (per CLAUDE.md §5)
+- One logical change? (per AGENTS.md §5)
 - Scope conventional? (`feat(area):` / `fix(area):` etc)
 - New deps in their own commit?
 - DEPS.md entry for any new dep?
@@ -65,7 +65,7 @@ Then check the full diff for anything outside the ticket scope.
 
 ## Step 7 — PR description draft
 
-Per CLAUDE.md §9.5 — three blocks:
+Per AGENTS.md §9.5 — three blocks:
 
 ```markdown
 ## Summary

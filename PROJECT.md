@@ -15,6 +15,16 @@
 
 ---
 
+## North Star
+
+> **Fill on kickoff.** Run `/north-star` (or follow `docs/north-star-kickoff.md`) with the maintainer to converge on these. Until the placeholders below are replaced, the relevance gate in `AGENTS.md §4` has nothing to trace tasks against — and per that gate, the first non-trivial task in this repo is to run the kickoff ritual.
+
+- **Metric:** `<single countable thing tied to the value moment — not a vanity count>`
+- **What this means for what we build:** `<one sentence — the kinds of work that move this metric>`
+- **What does NOT serve this:** `<one sentence — the kinds of work that look productive but don't move it>`
+
+---
+
 ## The problem
 
 `<What's broken in the current world? Why is this worth building? Be specific about which user pain points are addressed.>`
@@ -99,4 +109,4 @@ These are noted so they don't get re-litigated in Phase 1A:
 
 ---
 
-_Last updated `<DATE>`. Refine in Phase 1A as more is learned. Treat this document as the contract for what's in MVP and what isn't — anything outside the IN-scope list above requires explicit negotiation per CLAUDE.md §4 (stop-and-ask)._
+_Last updated `<DATE>`. Refine in Phase 1A as more is learned. Treat this document as the contract for what's in MVP and what isn't — anything outside the IN-scope list above requires explicit negotiation per AGENTS.md §4 (stop-and-ask), and per the same section every non-trivial task must trace to the North Star above._

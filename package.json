@@ -1,8 +1,8 @@
 {
-  "name": "claude-project-starter",
+  "name": "ai-assisted-project-starter",
   "version": "0.0.0",
   "private": true,
-  "description": "Monorepo starter with the CLAUDE.md working contract, ADR pattern, AI-attribution scanner, and pre-PR review flow baked in.",
+  "description": "Monorepo starter with the AGENTS.md working contract, multi-harness command layout (Claude Code + Pi), product North Star kickoff, ADR pattern, AI-attribution scanner, and pre-PR review flow baked in.",
   "packageManager": "pnpm@10.33.3",
   "engines": {
     "node": ">=20.10.0"

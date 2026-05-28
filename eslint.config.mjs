@@ -33,7 +33,7 @@ export default tseslint.config(
       },
     },
     rules: {
-      // CLAUDE.md §3 banned patterns, enforced where ESLint can.
+      // AGENTS.md §3 banned patterns, enforced where ESLint can.
       'no-console': 'error',
       eqeqeq: ['error', 'always'],
       'no-var': 'error',
@@ -52,7 +52,7 @@ export default tseslint.config(
       ],
     },
   },
-  // packages/shared must stay platform-agnostic per CLAUDE.md §2.
+  // packages/shared must stay platform-agnostic per AGENTS.md §2.
   // Adjust the file glob if your platform-agnostic package lives elsewhere.
   {
     files: ['packages/shared/**/*.{ts,tsx,js,mjs,cjs}'],
@@ -61,15 +61,15 @@ export default tseslint.config(
         'error',
         {
           name: 'document',
-          message: 'packages/shared is platform-agnostic per CLAUDE.md §2',
+          message: 'packages/shared is platform-agnostic per AGENTS.md §2',
         },
         {
           name: 'window',
-          message: 'packages/shared is platform-agnostic per CLAUDE.md §2',
+          message: 'packages/shared is platform-agnostic per AGENTS.md §2',
         },
         {
           name: 'navigator',
-          message: 'packages/shared is platform-agnostic per CLAUDE.md §2',
+          message: 'packages/shared is platform-agnostic per AGENTS.md §2',
         },
       ],
     },

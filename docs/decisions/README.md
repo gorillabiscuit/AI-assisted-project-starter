@@ -8,7 +8,7 @@ Five sections per ADR: **Status / Date / What we chose / What we rejected / Why 
 
 ## When to write one
 
-Per `CLAUDE.md §10`, ADRs cover architectural decisions that:
+Per `AGENTS.md §10`, ADRs cover architectural decisions that:
 
 - Have lasting impact on the codebase shape
 - Have rejected alternatives worth recording (so we don't re-debate)

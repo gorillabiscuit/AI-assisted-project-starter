@@ -1,6 +1,6 @@
 # ADR-0000: Architecture overview
 
-**Status:** Draft. To be reviewed and finalised in Phase 1 by the Claude Code session that picks up after kickoff.
+**Status:** Draft. To be reviewed and finalised in Phase 1 by the first AI-coding-agent session that picks up after kickoff.
 **Date:** `<DATE>`
 **Supersedes:** —
 
@@ -32,7 +32,7 @@ the data stores, the third-party integrations, and the boundaries between
 
 ## Why
 
-`<The reasoning. Address: which architectural invariants from CLAUDE.md §2 this satisfies; which Phase 1A scope items it enables; which Phase 1B/2 features it leaves room for; what trade-offs were accepted.>`
+`<The reasoning. Address: which architectural invariants from AGENTS.md §2 this satisfies; how the shape serves PROJECT.md's North Star (per AGENTS.md §4 relevance gate); which Phase 1A scope items it enables; which Phase 1B/2 features it leaves room for; what trade-offs were accepted.>`
 
 ---
 

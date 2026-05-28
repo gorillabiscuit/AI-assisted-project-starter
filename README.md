@@ -1,25 +1,35 @@
-# claude-project-starter
+# ai-assisted-project-starter
 
 A pnpm-monorepo starter that bakes in the working contract, doc layout, and
 tooling that's already proven across multiple projects. Designed so a new
-project can be productive with Claude Code from the first session — the
-guardrails are pre-wired, the conventions are pre-decided, and the
-project-specific scaffolding is clearly marked.
+project can be productive with an AGENTS-compatible coding agent — Claude
+Code, Pi, or any other — from the first session. The guardrails are
+pre-wired, the conventions are pre-decided, and the project-specific
+scaffolding is clearly marked.
 
 **What this gives you on day one:**
 
-- `CLAUDE.md` — the working contract between you and the AI agent. Banned
-  patterns, stop-and-ask gates, commit conventions, pre-PR process, testing
-  approach (Approach A/B/C with sub-agent isolation for moat-relevant code).
+- `AGENTS.md` — the working contract between you and the AI agent
+  (`CLAUDE.md` is a symlink to it, so Claude Code's discovery path keeps
+  working unchanged). Banned patterns, stop-and-ask gates including a North
+  Star relevance gate, commit conventions, pre-PR process, testing approach
+  (Approach A/B/C with sub-agent isolation for moat-relevant code).
+- `PROJECT.md` with a `## North Star` block + `docs/north-star-kickoff.md`
+  ritual + `/north-star` command in both harnesses, so the first thing a
+  new project does is pick the single metric every feature must trace to.
+- Harness command layout — `.claude/commands/` for Claude Code,
+  `.pi/prompts/` for Pi, both symlinked to the same canonical doc bodies so
+  there's one source of truth.
 - ADR pattern (`docs/decisions/`) + lightweight runbook pattern
   (`docs/runbooks/`).
 - `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons — each
-  with the "why this exists / when to update" prose intact.
+  with the "why this exists / when to update" prose intact. ROADMAP
+  milestones carry a `North Star linkage:` line.
 - AI-attribution pre-push scanner (`scripts/scan-ai-attribution.sh`) wired
   into `.husky/pre-push` so AI-co-author trailers can never reach a PR.
-- `/pre-pr` Claude Code slash command that runs the full §7 pre-PR review
-  inline (gates, diff walk, sub-agent meta-check, AC mapping, commit
-  hygiene, rebase status, PR-description draft).
+- `/pre-pr` command (works in both harnesses) that runs the full §7
+  pre-PR review inline: gates, diff walk, sub-agent meta-check, AC
+  mapping, commit hygiene, rebase status, PR-description draft.
 - TypeScript strict baseline (`noUncheckedIndexedAccess`,
   `exactOptionalPropertyTypes`, the works).
 - ESLint flat config + Prettier + lint-staged + husky pre-commit /
@@ -32,8 +42,8 @@ project-specific scaffolding is clearly marked.
 - A specific database / ORM / auth provider — pick per project and ADR
   the choice.
 - Application code, schema, routes — empty `apps/web/` and
-  `packages/shared/` placeholders ship with `CLAUDE.md` overlays and
-  nothing else.
+  `packages/shared/` placeholders ship with `AGENTS.md` overlays (and
+  matching `CLAUDE.md` symlinks) and nothing else.
 
 ---
 
@@ -41,25 +51,34 @@ project-specific scaffolding is clearly marked.
 
 ```bash
 # 1. Clone or template-clone into a new project directory
-gh repo create my-new-project --template gorillabiscuit/claude-project-starter --private --clone
+gh repo create my-new-project --template gorillabiscuit/ai-assisted-project-starter --private --clone
 # OR:
-git clone git@github.com:gorillabiscuit/claude-project-starter.git my-new-project
+git clone git@github.com:gorillabiscuit/ai-assisted-project-starter.git my-new-project
 cd my-new-project
 rm -rf .git && git init
 
-# 2. Edit project identity
-#    - CLAUDE.md  §1 "Project identity" — name, phase, tracker
-#    - PROJECT.md — replace skeleton with your product brief
+# 2. Run the North Star kickoff BEFORE anything else
+#    Open with your agent (Claude Code or Pi) and invoke /north-star
+#    (or follow docs/north-star-kickoff.md by hand). Output: PROJECT.md's
+#    ## North Star block filled with metric + companion sentence + boundary.
+#    Per AGENTS.md §4, no other non-trivial task may proceed until these
+#    placeholders are replaced.
+
+# 3. Edit project identity
+#    - AGENTS.md §1 "Project identity" — name, phase, tracker
+#      (CLAUDE.md is a symlink to AGENTS.md; edit AGENTS.md.)
+#    - PROJECT.md — fill out the rest of the brief; the North Star sharpens
+#      the cut-line.
 #    - package.json `name` field — your project name
 #    - docs/decisions/0000-architecture-overview.md — your macro shape
 
-# 3. Install deps and run prepare (sets up husky hooks)
+# 4. Install deps and run prepare (sets up husky hooks)
 pnpm install
 
-# 4. Verify gates work on the empty scaffolding
+# 5. Verify gates work on the empty scaffolding
 pnpm preflight    # typecheck + lint + test (will exit clean — nothing to check yet)
 
-# 5. Open with Claude Code and start with KICKOFF.md
+# 6. Open KICKOFF.md and walk Phase 1 (stack-selection ADRs)
 ```
 
 ---
@@ -68,15 +87,17 @@ pnpm preflight    # typecheck + lint + test (will exit clean — nothing to chec
 
 ```
 .
-├── CLAUDE.md              The working contract. Read end-to-end before any work.
+├── AGENTS.md              The working contract. Read end-to-end before any work.
+├── CLAUDE.md              Symlink to AGENTS.md (Claude Code discovery).
 ├── KICKOFF.md             What the first session should do; remove once it has.
-├── PROJECT.md             Product brief skeleton. Fill before writing code.
+├── PROJECT.md             Product brief skeleton with ## North Star block.
 ├── DEPS.md                Per-dependency justification, one line each.
 ├── LEARNED.md             Sharp-edges journal — append when something costs >15 min.
 ├── README.md              You are here.
 │
 ├── docs/
-│   ├── ROADMAP.md         Sequenced milestone view; complements PROJECT.md.
+│   ├── ROADMAP.md         Sequenced milestone view; each milestone carries a North Star linkage line.
+│   ├── north-star-kickoff.md  Kickoff ritual — fills PROJECT.md's North Star.
 │   ├── decisions/
 │   │   ├── README.md      ADR index + format reference.
 │   │   ├── _template.md   Empty ADR — copy this when adding one.
@@ -87,7 +108,13 @@ pnpm preflight    # typecheck + lint + test (will exit clean — nothing to chec
 │
 ├── .claude/
 │   └── commands/
-│       └── pre-pr.md      `/pre-pr` slash command — full §7 inline.
+│       ├── pre-pr.md      `/pre-pr` — full §7 inline (canonical).
+│       └── north-star.md  Symlink → docs/north-star-kickoff.md.
+│
+├── .pi/
+│   └── prompts/
+│       ├── pre-pr.md      Symlink → .claude/commands/pre-pr.md.
+│       └── north-star.md  Symlink → docs/north-star-kickoff.md.
 │
 ├── .husky/
 │   ├── pre-commit         lint-staged
@@ -98,11 +125,13 @@ pnpm preflight    # typecheck + lint + test (will exit clean — nothing to chec
 │
 ├── apps/
 │   └── web/
-│       └── CLAUDE.md      Per-package rules overlay (skeleton).
+│       ├── AGENTS.md      Per-package rules overlay (skeleton).
+│       └── CLAUDE.md      Symlink to apps/web/AGENTS.md.
 │
 ├── packages/
 │   └── shared/
-│       └── CLAUDE.md      Platform-agnostic package overlay (skeleton).
+│       ├── AGENTS.md      Platform-agnostic package overlay (skeleton).
+│       └── CLAUDE.md      Symlink to packages/shared/AGENTS.md.
 │
 ├── eslint.config.mjs      Flat config. Banned-pattern rules enforced.
 ├── tsconfig.base.json     Strict TypeScript baseline.
@@ -123,10 +152,11 @@ the project-specific content begins:
 
 | File | What to keep | What to replace |
 |---|---|---|
-| `CLAUDE.md` | §2–§12 (conventions, banned patterns, pre-PR, testing, etc) | §1 "Project identity" — replace with your name, phase, tracker, repo structure |
-| `apps/web/CLAUDE.md` | Pattern + "imports allowed/forbidden" structure | Specific package imports for your stack |
-| `packages/shared/CLAUDE.md` | Platform-agnostic rule + banned patterns | Project-specific anti-patterns if any |
-| `PROJECT.md` | Section headings | Everything below the headings |
+| `AGENTS.md` (root; `CLAUDE.md` symlinks to it) | §2–§12 (conventions, banned patterns, pre-PR, testing, etc) | §1 "Project identity" — replace with your name, phase, tracker, repo structure |
+| `apps/web/AGENTS.md` (and its `CLAUDE.md` symlink) | Pattern + "imports allowed/forbidden" structure | Specific package imports for your stack |
+| `packages/shared/AGENTS.md` (and its `CLAUDE.md` symlink) | Platform-agnostic rule + banned patterns | Project-specific anti-patterns if any |
+| `PROJECT.md` | Section headings + the `## North Star` block scaffold | Fill the North Star block via `/north-star` BEFORE writing the rest; then replace skeleton content below |
+| `docs/north-star-kickoff.md` | Verbatim — the ritual works in any project | Nothing |
 | `docs/decisions/0000-architecture-overview.md` | The ADR-0000 structure | The ASCII diagram + every choice |
 | `docs/decisions/QUEUE.md` | The intro prose explaining the queue | Empty until you have pending stack-selection ADRs |
 | `package.json` | Scripts block + devDependencies | `name` field |
@@ -138,7 +168,7 @@ Everything else is generic and can stay verbatim.
 
 ## Why these conventions?
 
-A separate doc describes the rationale for each rule in CLAUDE.md (e.g. why
+A separate doc describes the rationale for each rule in AGENTS.md (e.g. why
 `==` is banned, why ADRs follow this specific format, why tests use
 Approach B for moat code). That history isn't here yet — for now,
-`CLAUDE.md` itself has the reasoning inline as comments where it matters.
+`AGENTS.md` itself has the reasoning inline as comments where it matters.

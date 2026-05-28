@@ -3,7 +3,7 @@
 #
 # Aborts the push if any commit on this branch (vs the base branch)
 # contains an AI-attribution trailer in its commit message TRAILERS.
-# Per CLAUDE.md §5.
+# Per AGENTS.md §5.
 #
 # Wired into .husky/pre-push as the AI-attribution scan step. To
 # install (one-time per clone):
@@ -62,7 +62,7 @@ done < <(git log "${BASE_BRANCH}..HEAD" --format='%H' 2>/dev/null)
 if [ -n "${OFFENDERS}" ]; then
   echo
   echo "ERROR: AI-attribution trailer detected. Push aborted."
-  echo "Per CLAUDE.md §5, no Co-Authored-By: Claude or"
+  echo "Per AGENTS.md §5, no Co-Authored-By: Claude or"
   echo "Generated with Claude Code trailers are allowed."
   echo
   echo -e "Offending commits:${OFFENDERS}"
