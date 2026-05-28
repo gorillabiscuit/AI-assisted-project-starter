@@ -9,5 +9,8 @@ export default defineConfig({
     globals: false,
     include: ['{apps,packages}/**/*.{test,spec}.{ts,tsx}'],
     exclude: ['**/node_modules/**', '**/dist/**', '**/.next/**'],
+    // Empty-scaffolding hygiene: starter ships with no tests yet, and the
+    // README promises `pnpm preflight` exits clean on a fresh clone.
+    passWithNoTests: true,
   },
 });
