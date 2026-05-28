@@ -81,6 +81,18 @@ pnpm preflight    # typecheck + lint + test (will exit clean — nothing to chec
 # 6. Open KICKOFF.md and walk Phase 1 (stack-selection ADRs)
 ```
 
+### Adopting this in an existing repo (retrofit)
+
+Skip the `gh repo create` step. From the root of your existing repo, copy in
+(or symlink) `AGENTS.md`, `docs/north-star-kickoff.md`, the
+`.claude/commands/north-star.md` + `.pi/prompts/north-star.md` command
+symlinks, the AI-attribution pre-push hook (`scripts/scan-ai-attribution.sh`
++ `.husky/pre-push`), and — if you don't already have one — the
+`## North Star` block in `PROJECT.md`. Then run `/north-star` and pick
+**retrofit mode** at Phase 0. The agent will read your repo (README,
+PROJECT.md, recent commits, ROADMAP, LEARNED) before asking anything, and
+write the result as a dated amendment to PROJECT.md, not a replacement.
+
 ---
 
 ## Layout
