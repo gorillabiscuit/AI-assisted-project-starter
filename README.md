@@ -14,9 +14,11 @@ scaffolding is clearly marked.
   working unchanged). Banned patterns, stop-and-ask gates including a North
   Star relevance gate, commit conventions, pre-PR process, testing approach
   (Approach A/B/C with sub-agent isolation for moat-relevant code).
-- `PROJECT.md` with a `## North Star` block + `docs/north-star-kickoff.md`
-  ritual + `/north-star` command in both harnesses, so the first thing a
-  new project does is pick the single metric every feature must trace to.
+- `PROJECT.md` with a `## North Star` block + the `/north-star` command in
+  both harnesses (the ritual itself ships as a standalone skill —
+  [gorillabiscuit/north-star-skill](https://github.com/gorillabiscuit/north-star-skill)),
+  so the first thing a new project does is pick the single metric every
+  feature must trace to.
 - Harness command layout — `.claude/commands/` for Claude Code,
   `.pi/prompts/` for Pi, both symlinked to the same canonical doc bodies so
   there's one source of truth.
@@ -57,12 +59,15 @@ git clone git@github.com:gorillabiscuit/ai-assisted-project-starter.git my-new-p
 cd my-new-project
 rm -rf .git && git init
 
-# 2. Run the North Star kickoff BEFORE anything else
-#    Open with your agent (Claude Code or Pi) and invoke /north-star
-#    (or follow docs/north-star-kickoff.md by hand). Output: PROJECT.md's
-#    ## North Star block filled with metric + companion sentence + boundary.
-#    Per AGENTS.md §4, no other non-trivial task may proceed until these
-#    placeholders are replaced.
+# 2. Install the North Star skill, then run the kickoff BEFORE anything else
+#    The ritual ships as a standalone skill. Install it once at the user level:
+#      git clone https://github.com/gorillabiscuit/north-star-skill.git \
+#        ~/.claude/skills/north-star
+#    Then open the project with your agent (Claude Code or Pi) and invoke
+#    /north-star. Output: PROJECT.md's ## North Star block filled with metric
+#    + companion sentence + boundary. Per AGENTS.md §4, no other non-trivial
+#    task may proceed until these placeholders are replaced.
+#    (See docs/north-star-kickoff.md for the install pointer.)
 
 # 3. Edit project identity
 #    - AGENTS.md §1 "Project identity" — name, phase, tracker
@@ -83,15 +88,21 @@ pnpm preflight    # typecheck + lint + test (will exit clean — nothing to chec
 
 ### Adopting this in an existing repo (retrofit)
 
-Skip the `gh repo create` step. From the root of your existing repo, copy in
-(or symlink) `AGENTS.md`, `docs/north-star-kickoff.md`, the
-`.claude/commands/north-star.md` + `.pi/prompts/north-star.md` command
-symlinks, the AI-attribution pre-push hook (`scripts/scan-ai-attribution.sh`
-+ `.husky/pre-push`), and — if you don't already have one — the
-`## North Star` block in `PROJECT.md`. Then run `/north-star` and pick
-**retrofit mode** at Phase 0. The agent will read your repo (README,
-PROJECT.md, recent commits, ROADMAP, LEARNED) before asking anything, and
-write the result as a dated amendment to PROJECT.md, not a replacement.
+Skip the `gh repo create` step. First install the North Star skill at the user
+level (once per machine):
+
+```bash
+git clone https://github.com/gorillabiscuit/north-star-skill.git \
+  ~/.claude/skills/north-star
+```
+
+Then, from the root of your existing repo, copy in (or symlink) `AGENTS.md`, the
+AI-attribution pre-push hook (`scripts/scan-ai-attribution.sh` +
+`.husky/pre-push`), and — if you don't already have one — the `## North Star`
+block in `PROJECT.md`. Then run `/north-star` and pick **retrofit mode** at
+Phase 0. The agent will read your repo (README, PROJECT.md, recent commits,
+ROADMAP, LEARNED) before asking anything, and write the result as a dated
+amendment to PROJECT.md, not a replacement.
 
 ---
 
@@ -109,7 +120,7 @@ write the result as a dated amendment to PROJECT.md, not a replacement.
 │
 ├── docs/
 │   ├── ROADMAP.md         Sequenced milestone view; each milestone carries a North Star linkage line.
-│   ├── north-star-kickoff.md  Kickoff ritual — fills PROJECT.md's North Star.
+│   ├── north-star-kickoff.md  Pointer to the standalone north-star skill (ritual no longer ships here).
 │   ├── decisions/
 │   │   ├── README.md      ADR index + format reference.
 │   │   ├── _template.md   Empty ADR — copy this when adding one.
@@ -121,12 +132,12 @@ write the result as a dated amendment to PROJECT.md, not a replacement.
 ├── .claude/
 │   └── commands/
 │       ├── pre-pr.md      `/pre-pr` — full §7 inline (canonical).
-│       └── north-star.md  Symlink → docs/north-star-kickoff.md.
+│       └── north-star.md  Symlink → docs/north-star-kickoff.md (install pointer; ritual is the north-star skill).
 │
 ├── .pi/
 │   └── prompts/
 │       ├── pre-pr.md      Symlink → .claude/commands/pre-pr.md.
-│       └── north-star.md  Symlink → docs/north-star-kickoff.md.
+│       └── north-star.md  Symlink → docs/north-star-kickoff.md (install pointer; ritual is the north-star skill).
 │
 ├── .husky/
 │   ├── pre-commit         lint-staged
@@ -168,7 +179,7 @@ the project-specific content begins:
 | `apps/web/AGENTS.md` (and its `CLAUDE.md` symlink) | Pattern + "imports allowed/forbidden" structure | Specific package imports for your stack |
 | `packages/shared/AGENTS.md` (and its `CLAUDE.md` symlink) | Platform-agnostic rule + banned patterns | Project-specific anti-patterns if any |
 | `PROJECT.md` | Section headings + the `## North Star` block scaffold | Fill the North Star block via `/north-star` BEFORE writing the rest; then replace skeleton content below |
-| `docs/north-star-kickoff.md` | Verbatim — the ritual works in any project | Nothing |
+| `docs/north-star-kickoff.md` | The pointer to the standalone north-star skill | Nothing (the ritual lives in the skill repo now) |
 | `docs/decisions/0000-architecture-overview.md` | The ADR-0000 structure | The ASCII diagram + every choice |
 | `docs/decisions/QUEUE.md` | The intro prose explaining the queue | Empty until you have pending stack-selection ADRs |
 | `package.json` | Scripts block + devDependencies | `name` field |

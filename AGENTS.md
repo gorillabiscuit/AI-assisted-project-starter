@@ -30,7 +30,7 @@ packages/
   ui/         ← React components for web
 docs/
   decisions/        ← ADRs
-  north-star-kickoff.md  ← run at project start to fill PROJECT.md's North Star
+  north-star-kickoff.md  ← pointer to the /north-star skill that fills PROJECT.md's North Star
 scripts/      ← project-level scripts (gates, hooks)
 .claude/
   commands/   ← Claude Code slash commands (e.g. /pre-pr, /north-star)
@@ -80,7 +80,7 @@ The agent must not do any of these. If instructed to, stop and flag.
 
 Before doing any of these, pause and confirm with the human in the chat:
 
-- **North Star relevance gate.** Before starting any non-trivial task — or whenever scope expands past the original ask — state in one line how the work traces to `PROJECT.md`'s North Star. If it can't be traced, stop and surface it instead of proceeding. **The North Star takes precedence:** when a request and the North Star conflict, flag the conflict and let the human resolve it rather than silently doing both. If `PROJECT.md`'s North Star block is missing, still placeholder text (`<...>` markers, "fill on kickoff"), or hasn't been confirmed by running the kickoff ritual (`docs/north-star-kickoff.md` / `/north-star`), treat that itself as a stop-and-ask — run the ritual in greenfield or retrofit mode (per Phase 0 of the kickoff doc) before any feature work.
+- **North Star relevance gate.** Before starting any non-trivial task — or whenever scope expands past the original ask — state in one line how the work traces to `PROJECT.md`'s North Star. If it can't be traced, stop and surface it instead of proceeding. **The North Star takes precedence:** when a request and the North Star conflict, flag the conflict and let the human resolve it rather than silently doing both. If `PROJECT.md`'s North Star block is missing, still placeholder text (`<...>` markers, "fill on kickoff"), or hasn't been confirmed by running the kickoff ritual (the `/north-star` skill — install per `docs/north-star-kickoff.md`), treat that itself as a stop-and-ask — run the ritual in greenfield or retrofit mode (per Phase 0 of the skill) before any feature work.
 - **Adding a new dependency to any `package.json`.** Each new dep gets its own commit + a line in `DEPS.md` justifying it.
 - **Rewriting a file when only a small change was requested.**
 - **Changing the public shape of any API procedure** (path, input schema, output schema).
@@ -310,7 +310,7 @@ No emoji. No AI-attribution.
 | `AGENTS.md` (this file; `CLAUDE.md` is a symlink to it) | Contract between human and AI; conventions and rules | Team + AI |
 | `apps/*/AGENTS.md` (`apps/*/CLAUDE.md` symlinks here) | Package-specific rules; inherits this file | Team + AI |
 | `packages/*/AGENTS.md` (`packages/*/CLAUDE.md` symlinks here) | Package-specific rules; inherits this file | Team + AI |
-| `docs/north-star-kickoff.md` | Kickoff ritual — interview the human to fill `PROJECT.md`'s North Star block | Team + AI |
+| `docs/north-star-kickoff.md` | Pointer to the standalone `/north-star` skill (the ritual that fills `PROJECT.md`'s North Star block) | Team + AI |
 | `.claude/commands/`, `.pi/prompts/` | Harness-specific command files; canonical bodies live elsewhere and are symlinked | AI |
 | `docs/decisions/` | ADRs (architecture decision records), numbered, chronological | Team |
 | `docs/runbooks/` | One-page-per-vendor incident references — what breaks, manual fallback, status pages, key rotation | Team |
