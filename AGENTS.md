@@ -96,6 +96,7 @@ Before doing any of these, pause and confirm with the human in the chat:
 - **Processing user data without an explicit user action** — nightly recompute jobs over user histories, behavioural-signal aggregation, ML training inputs, batch updates triggered by upstream webhooks. Read-on-request from a logged-in user is fine; background work over user data needs confirmation because the user isn't there to consent in the moment.
 - *Add project-specific stop-and-ask items here* — e.g. "touching the recommendation engine boundary," "modifying the payment intent flow," "anything that changes pricing display."
 - **Adding any kind of analytics / tracking pixel / third-party script.**
+- **Mid-task scope expansion.** If a task grows beyond its original ask — a new dependency surfaces, an architectural fork appears, a spec ambiguity is discovered — stop and surface it rather than picking silently. A 30-second check costs less than unwinding a wrong direction.
 
 ---
 
@@ -199,6 +200,8 @@ The only invisible automation is the **pre-push hook** (`scripts/scan-ai-attribu
 ---
 
 ## 8. Testing conventions
+
+After every meaningful change — not just pre-PR — run the narrowest applicable gate: `pnpm test <path>` for logic changes, `pnpm typecheck` for type-boundary changes, `pnpm preflight` when touching an external interface. Don't batch changes without verifying the first one landed clean.
 
 - **Split sessions for tests on non-trivial logic.** Implementation in one conversation turn; tests written in a fresh turn (or by a sub-agent) with only the spec / contract visible. Prevents rubber-stamp tests that encode the agent's own misunderstanding.
 - **One behaviour per test.** No multi-assert tests testing several things.
@@ -339,3 +342,13 @@ Weigh proposed conventions against the North Star: a rule that won't ever influe
 If the agent is about to produce something it has low confidence in — architectural choice, non-obvious algorithm, security-adjacent code — it stops and surfaces the uncertainty to the human instead of generating plausible-looking but unverified code. "I don't know" is a valid answer and always preferable to a confident hallucination.
 
 The same applies to the human. If a rule in this file is producing bad outcomes, propose changing it; don't quietly skip it.
+
+---
+
+## 13. Session hygiene — context as working memory
+
+Treat the context window like RAM, not a transcript. Completed reasoning should be compressed, not dragged forward.
+
+- **Session start:** state in one sentence what was last completed, what the current goal is, and what the next open decision is.
+- **Session end (long sessions):** emit a 3-bullet `DONE / CURRENT / NEXT` summary the human can paste into the next session's first message.
+- **Don't re-derive:** if a decision was already made in this session, reference it — don't reason through it again.
