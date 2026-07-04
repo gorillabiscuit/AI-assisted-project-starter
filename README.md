@@ -162,12 +162,16 @@ amendment to PROJECT.md, not a replacement.
 ├── apps/
 │   └── web/
 │       ├── AGENTS.md      Per-package rules overlay (skeleton).
-│       └── CLAUDE.md      Symlink to apps/web/AGENTS.md.
+│       ├── CLAUDE.md      Symlink to apps/web/AGENTS.md.
+│       └── tsconfig.json  Extends tsconfig.base.json — ships upfront so
+│                          ESLint's typed-lint projectService has a
+│                          project to resolve before any .ts file lands.
 │
 ├── packages/
 │   └── shared/
 │       ├── AGENTS.md      Platform-agnostic package overlay (skeleton).
-│       └── CLAUDE.md      Symlink to packages/shared/AGENTS.md.
+│       ├── CLAUDE.md      Symlink to packages/shared/AGENTS.md.
+│       └── tsconfig.json  Same reasoning as apps/web/tsconfig.json.
 │
 ├── eslint.config.mjs      Flat config. Banned-pattern rules enforced.
 ├── tsconfig.base.json     Strict TypeScript baseline.
