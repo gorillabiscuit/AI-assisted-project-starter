@@ -1,0 +1,39 @@
+# CI backstop for the local gates. The husky hooks (pre-commit
+# lint-staged, pre-push preflight + AI-attribution scan) are the first
+# line, but hooks are bypassable (`git push --no-verify`, a clone where
+# `pnpm install` never ran, GitHub-web commits). CI is the gate an
+# agent can't route around.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm preflight
+
+  ai-attribution:
+    # Re-runs scripts/scan-ai-attribution.sh against the PR's base so
+    # attribution that slipped past (or around) the pre-push hook is
+    # caught before it becomes PR-visible. Push-to-main runs skip this
+    # job — there's no base range to scan.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: bash scripts/scan-ai-attribution.sh
+        env:
+          PRE_PUSH_BASE_BRANCH: origin/${{ github.base_ref }}
