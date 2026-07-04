@@ -52,6 +52,25 @@ export default tseslint.config(
       ],
     },
   },
+  // Typed lint rules for workspace source. Unawaited promises are one of
+  // the most common AI-generated bugs — code that looks right, passes
+  // non-typed lint, and silently drops errors. Requires type info, hence
+  // projectService (each package needs a tsconfig; the bootstrap phase
+  // adds one per package anyway for `pnpm -r typecheck`).
+  {
+    files: ['{apps,packages}/**/*.{ts,tsx}'],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-misused-promises': 'error',
+      '@typescript-eslint/await-thenable': 'error',
+    },
+  },
   // packages/shared must stay platform-agnostic per AGENTS.md §2.
   // Adjust the file glob if your platform-agnostic package lives elsewhere.
   {

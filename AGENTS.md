@@ -67,6 +67,7 @@ The agent must not do any of these. If instructed to, stop and flag.
 - **No `var`.** `const` by default; `let` if reassigned.
 - **No console.log in committed code.** Use the project logger (introduce one when adding observability). `console.log` is a code-review-blocker.
 - **No silent catch.** `try { ... } catch {}` and `try { ... } catch (e) { /* ignored */ }` both banned. Either log it, re-throw it, or surface it via the error-handling layer — never swallow.
+- **No floating promises.** Every promise is awaited, returned, or explicitly voided with a one-line comment saying why fire-and-forget is safe here. Unawaited promises silently drop errors — a classic AI-generated bug that passes non-typed lint. Enforced via `@typescript-eslint/no-floating-promises` (typed lint).
 - **No `as` type casts** without a one-line comment explaining why the type system can't verify it.
 - **No hallucinated imports.** If the symbol doesn't exist in a real npm package at the version we have installed, don't write code calling it. TypeScript and ESLint catch most cases but verify.
 - **No PII / secrets in source, tests, or fixtures.** Use env vars and `.env.example` placeholders.
