@@ -39,6 +39,14 @@ set -o pipefail
 # branch other than origin/main. For most workflows the default works.
 BASE_BRANCH="${PRE_PUSH_BASE_BRANCH:-origin/main}"
 
+# STRICT: set by CI (see .github/workflows/ci.yml) to turn "can't
+# resolve base branch" from a silent pass into a hard failure. Local
+# pushes stay lenient (offline, initial push, untracked base branch are
+# all normal); CI is the backstop and must not be able to regress into
+# a silent no-op the way it did before this flag existed — a checkout
+# misconfiguration should fail loudly, not scan zero commits and pass.
+STRICT="${AI_ATTRIBUTION_STRICT:-0}"
+
 # Scan 1 pattern — matched against PARSED TRAILERS only. The grep is
 # case-insensitive; the pattern allows flexible whitespace because
 # canonical trailers use exactly one space but obfuscation attempts
@@ -55,10 +63,18 @@ BODY_PATTERN='^[[:space:]]*(🤖[[:space:]]*)?generated[[:space:]]+with[[:space:
 # uses local refs in that case.
 git fetch --quiet origin 2>/dev/null || true
 
-# If the base branch isn't reachable locally, don't block the push —
-# warn and exit clean. Some workflows (initial push, branch from a
-# non-tracked base) hit this.
+# If the base branch isn't reachable locally: in STRICT mode (CI) this
+# is a hard failure — a backstop that silently scans nothing is worse
+# than no backstop, because it looks green. Outside STRICT (local
+# pushes) don't block — warn and exit clean, since offline pushes and
+# untracked base branches are normal there.
 if ! git rev-parse --verify "${BASE_BRANCH}" >/dev/null 2>&1; then
+  if [ "${STRICT}" = "1" ]; then
+    echo "ERROR: ${BASE_BRANCH} not reachable in STRICT mode — refusing to" >&2
+    echo "silently pass. Fetch the base ref before running this script" >&2
+    echo "(see .github/workflows/ci.yml for the CI invocation)." >&2
+    exit 1
+  fi
   echo "WARN: ${BASE_BRANCH} not reachable; skipping AI-attribution scan." >&2
   exit 0
 fi
