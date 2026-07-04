@@ -214,10 +214,10 @@ After every meaningful change — not just pre-PR — run the narrowest applicab
 |---|---|---|
 | **Scaffolding** (config, types, package boilerplate) | None | Nothing to rubber-stamp |
 | **Simple Logic** (mechanical, narrow contract) | **A** — in-turn discipline | Agent writes impl, commits, then writes tests against ONLY the contract / docstring / ADR — not the implementation file |
-| **Complex Logic** (anything moat-relevant, anything with subtle correctness invariants) | **B** — sub-agent isolation | Agent writes + commits implementation. Then spawns a fresh sub-agent with **only** the contract, ticket, and AGENTS.md — sub-agent writes tests in a genuinely separate context. Agent reviews output, commits. |
+| **Complex Logic** (anything moat-relevant, anything with subtle correctness invariants) | **B** — sub-agent isolation | Agent writes + commits implementation. Then spawns the **`test-writer` subagent** (`.claude/agents/test-writer.md`) with **only** the contract and ticket in its brief — it writes tests in a genuinely separate context and is instructed never to open the implementation file. Agent reviews output, commits. |
 | **Pure-logic function with fully-known contract** | **C** — TDD | Tests written **before** implementation; human reviews tests; implementation written to make tests pass. |
 
-Approach B is mandatory for anything in your project's *moat* package — the code that, if it became defensibly valuable, you'd want to productise without rewriting. Rubber-stamp tests there will hide real bugs.
+Approach B is mandatory for anything in your project's *moat* package — the code that, if it became defensibly valuable, you'd want to productise without rewriting. Rubber-stamp tests there will hide real bugs. The isolation is structural, not honour-system: `test-writer` is a defined subagent with its own context, so it cannot inherit the implementing session's assumptions.
 
 ### 8.2 Tools
 
