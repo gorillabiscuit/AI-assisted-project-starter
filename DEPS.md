@@ -30,16 +30,16 @@ Group by package within the monorepo (root, then per-app, per-package).
 ## Root (workspace)
 
 - **@eslint/js** *(^9.18.0)* — base ESLint JS rules. Required by the flat config in `eslint.config.mjs`.
-- **@types/node** *(^20.10.0)* — Node typings for scripts + config files.
+- **@types/node** *(^24.0.0)* — Node typings for scripts + config files.
 - **eslint** *(^9.18.0)* — linter. AGENTS.md §3 banned patterns enforced here.
 - **eslint-config-prettier** *(^10.0.0)* — disables ESLint rules that conflict with Prettier.
 - **globals** *(^15.14.0)* — env globals for ESLint (`node`, `browser`, etc).
 - **husky** *(^9.1.0)* — git hook wiring for `.husky/pre-commit` + `.husky/pre-push`. AGENTS.md §5 + §7.
 - **lint-staged** *(^15.0.0)* — runs eslint + prettier on staged files in `pre-commit`.
 - **prettier** *(^3.4.0)* — formatter.
-- **typescript** *(^5.7.0)* — type-checker.
+- **typescript** *(^6.0.0)* — type-checker.
 - **typescript-eslint** *(^8.20.0)* — TS plugin for ESLint flat config.
-- **vitest** *(^3.0.0)* — test runner. AGENTS.md §8.2.
+- **vitest** *(^4.1.0)* — test runner. AGENTS.md §8.2.
 
 ---
 
