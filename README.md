@@ -31,8 +31,11 @@ scaffolding is clearly marked.
 - `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons — each
   with the "why this exists / when to update" prose intact. ROADMAP
   milestones carry a `North Star linkage:` line.
-- AI-attribution pre-push scanner (`scripts/scan-ai-attribution.sh`) wired
-  into `.husky/pre-push` so AI-co-author trailers can never reach a PR.
+- Three-layer AI-attribution defence: a Claude Code commit-time hook
+  (`.claude/settings.json` + `scripts/hooks/block-ai-attribution-commit.sh`),
+  the pre-push scanner (`scripts/scan-ai-attribution.sh` via
+  `.husky/pre-push`), and a CI re-scan (`.github/workflows/ci.yml`) that
+  catches `--no-verify` bypasses. Trailers AND "Generated with" footers.
 - `/pre-pr` skill (works in both harnesses) that runs the full §7
   pre-PR review inline: gates, diff walk, sub-agent meta-check, AC
   mapping, commit hygiene, rebase status, PR-description draft.

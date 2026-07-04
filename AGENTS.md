@@ -110,7 +110,11 @@ Before doing any of these, pause and confirm with the human in the chat:
 - **No `Co-Authored-By: Claude`** or any AI co-author trailer. Commit as the human maintainer; no AI authorship claims anywhere in commit metadata.
 - **No "Generated with Claude Code" footers.**
 
-The pre-push hook (`scripts/scan-ai-attribution.sh`, wired in `.husky/pre-push`) automatically aborts pushes with AI-attribution trailers.
+Three layered gates enforce this deterministically — the rule does not rely on the agent remembering it:
+
+1. **Commit time** — a Claude Code `PreToolUse` hook (`.claude/settings.json` → `scripts/hooks/block-ai-attribution-commit.sh`) blocks `git commit` commands whose message carries attribution, before it enters history.
+2. **Push time** — `scripts/scan-ai-attribution.sh` (wired in `.husky/pre-push`) scans every branch commit and aborts the push.
+3. **CI** — the same scan re-runs against the PR base in `.github/workflows/ci.yml`, catching `--no-verify` bypasses and clones where husky was never installed.
 
 ### Review-Note trailers
 
