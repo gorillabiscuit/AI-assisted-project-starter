@@ -19,9 +19,13 @@ scaffolding is clearly marked.
   [gorillabiscuit/north-star-skill](https://github.com/gorillabiscuit/north-star-skill)),
   so the first thing a new project does is pick the single metric every
   feature must trace to.
-- Harness command layout — `.claude/commands/` for Claude Code,
-  `.pi/prompts/` for Pi, both symlinked to the same canonical doc bodies so
-  there's one source of truth.
+- Harness layout — `.claude/skills/` for Claude Code (the current skill
+  format; `.claude/commands/` is deprecated upstream and holds only the
+  north-star pointer stub), `.pi/prompts/` for Pi, symlinked to the same
+  canonical bodies so there's one source of truth.
+- Defined subagents (`.claude/agents/`) — `test-writer` (Approach B test
+  isolation, structural not honour-system) and `pessimistic-reviewer`
+  (the cold-context pre-PR meta-check).
 - ADR pattern (`docs/adr/`) + lightweight runbook pattern
   (`docs/runbooks/`).
 - `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons — each
@@ -29,7 +33,7 @@ scaffolding is clearly marked.
   milestones carry a `North Star linkage:` line.
 - AI-attribution pre-push scanner (`scripts/scan-ai-attribution.sh`) wired
   into `.husky/pre-push` so AI-co-author trailers can never reach a PR.
-- `/pre-pr` command (works in both harnesses) that runs the full §7
+- `/pre-pr` skill (works in both harnesses) that runs the full §7
   pre-PR review inline: gates, diff walk, sub-agent meta-check, AC
   mapping, commit hygiene, rebase status, PR-description draft.
 - TypeScript strict baseline (`noUncheckedIndexedAccess`,
@@ -131,13 +135,18 @@ amendment to PROJECT.md, not a replacement.
 │       └── README.md      Per-vendor incident reference pattern.
 │
 ├── .claude/
-│   └── commands/
-│       ├── pre-pr.md      `/pre-pr` — full §7 inline (canonical).
+│   ├── skills/
+│   │   └── pre-pr/
+│   │       └── SKILL.md   `/pre-pr` — full §7 inline (canonical). Repo-authored; tracked despite the installed-skills gitignore.
+│   ├── agents/
+│   │   ├── test-writer.md           Approach B isolated test writer (AGENTS.md §8.1).
+│   │   └── pessimistic-reviewer.md  Cold-context pre-PR meta-check (§7 step 3).
+│   └── commands/          Deprecated upstream; holds only the north-star pointer stub.
 │       └── north-star.md  Symlink → docs/north-star-kickoff.md (install pointer; ritual is the north-star skill).
 │
 ├── .pi/
 │   └── prompts/
-│       ├── pre-pr.md      Symlink → .claude/commands/pre-pr.md.
+│       ├── pre-pr.md      Symlink → .claude/skills/pre-pr/SKILL.md.
 │       └── north-star.md  Symlink → docs/north-star-kickoff.md (install pointer; ritual is the north-star skill).
 │
 ├── .husky/

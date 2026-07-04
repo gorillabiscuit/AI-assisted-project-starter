@@ -33,7 +33,9 @@ docs/
   north-star-kickoff.md  ← pointer to the /north-star skill that fills PROJECT.md's North Star
 scripts/      ← project-level scripts (gates, hooks)
 .claude/
-  commands/   ← Claude Code slash commands (e.g. /pre-pr, /north-star)
+  skills/     ← Claude Code skills (e.g. /pre-pr — canonical bodies)
+  agents/     ← defined subagents (test-writer, pessimistic-reviewer)
+  commands/   ← deprecated upstream; only the /north-star pointer stub remains
 .pi/
   prompts/    ← Pi commands (symlinked to the same canonical files)
 ```
@@ -314,7 +316,7 @@ No emoji. No AI-attribution.
 | `apps/*/AGENTS.md` (`apps/*/CLAUDE.md` symlinks here) | Package-specific rules; inherits this file | Team + AI |
 | `packages/*/AGENTS.md` (`packages/*/CLAUDE.md` symlinks here) | Package-specific rules; inherits this file | Team + AI |
 | `docs/north-star-kickoff.md` | Pointer to the standalone `/north-star` skill (the ritual that fills `PROJECT.md`'s North Star block) | Team + AI |
-| `.claude/commands/`, `.pi/prompts/` | Harness-specific command files; canonical bodies live elsewhere and are symlinked | AI |
+| `.claude/skills/`, `.claude/agents/`, `.pi/prompts/` | Repo-authored skills + subagents (canonical); `.pi/prompts/` symlinks to the same bodies. `.claude/commands/` holds only legacy pointer stubs | AI |
 | `docs/adr/` | ADRs (architecture decision records), numbered, chronological | Team |
 | `docs/runbooks/` | One-page-per-vendor incident references — what breaks, manual fallback, status pages, key rotation | Team |
 | `DEPS.md` | One-line justification per npm dependency | Team |

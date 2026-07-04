@@ -26,7 +26,8 @@ The starter gave you:
 
 - `AGENTS.md` (working contract — read end-to-end; `CLAUDE.md` is a symlink to it)
 - `docs/north-star-kickoff.md` + `/north-star` command in both harnesses
-- `.claude/commands/pre-pr.md` + `.pi/prompts/pre-pr.md` (`/pre-pr` review)
+- `.claude/skills/pre-pr/SKILL.md` + `.pi/prompts/pre-pr.md` (`/pre-pr` review)
+- `.claude/agents/` (test-writer + pessimistic-reviewer subagents)
 - `scripts/scan-ai-attribution.sh` + `.husky/pre-push` (AI-attribution gate)
 - `docs/adr/` (ADR pattern + `_template.md`)
 - `docs/runbooks/` (per-vendor incident reference pattern)
