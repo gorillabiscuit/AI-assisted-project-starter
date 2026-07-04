@@ -204,7 +204,8 @@ Everything else is generic and can stay verbatim.
 
 ## Why these conventions?
 
-A separate doc describes the rationale for each rule in AGENTS.md (e.g. why
-`==` is banned, why ADRs follow this specific format, why tests use
-Approach B for moat code). That history isn't here yet — for now,
-`AGENTS.md` itself has the reasoning inline as comments where it matters.
+The rationale lives inline where each rule does: `AGENTS.md` states per
+rule which AI-specific failure mode it catches, and the config files
+(`eslint.config.mjs`, `scripts/*.sh`, `.claude/settings.json`) carry
+why-comments where the reasoning isn't obvious from the rule itself.
+Project-specific reasoning goes in ADRs as decisions land.
