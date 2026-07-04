@@ -21,9 +21,19 @@ set -u
 
 INPUT=$(cat)
 
-# Only inspect git commit invocations. Allows a few intervening tokens
-# so `git -C <path> commit`, `git -c key=val commit` etc still match.
-printf '%s' "${INPUT}" | grep -qiE 'git([[:space:]]+[^[:space:]]+){0,4}[[:space:]]+commit' || exit 0
+# Only inspect git commit invocations. Deliberately unbounded between
+# `git` and `commit` (no token-count cap) — a bounded cap (e.g. "at
+# most 4 tokens") is a real bypass: `git -C <path> -c user.name=a -c
+# user.email=b -c commit.gpgsign=false commit -m "..."` is a completely
+# ordinary invocation an agent would use in a sandbox with no
+# configured git identity, and it alone has 9 intervening tokens.
+# Being this loose on the pre-filter is safe: a false positive here
+# only means we also run the attribution grep below on a non-commit
+# command, which is harmless (it just won't match and falls through to
+# exit 0). The failure mode this guards against — a false NEGATIVE that
+# skips the attribution check entirely — is the one that matters, and
+# an unbounded match closes it.
+printf '%s' "${INPUT}" | grep -qiE 'git[[:space:]].*commit' || exit 0
 
 if printf '%s' "${INPUT}" | grep -qiE 'co-authored-by[^"]{0,40}(claude|anthropic)|generated[[:space:]]+with[^"]{0,40}claude|🤖'; then
   {
