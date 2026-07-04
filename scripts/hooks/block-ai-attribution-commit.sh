@@ -19,6 +19,12 @@
 
 set -u
 
+# Pattern vocabulary is shared with scripts/scan-ai-attribution.sh via
+# scripts/lib/ai-attribution-patterns.sh — see that file for why.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=../lib/ai-attribution-patterns.sh
+source "${SCRIPT_DIR}/../lib/ai-attribution-patterns.sh"
+
 INPUT=$(cat)
 
 # Only inspect git commit invocations. Deliberately unbounded between
@@ -35,7 +41,7 @@ INPUT=$(cat)
 # an unbounded match closes it.
 printf '%s' "${INPUT}" | grep -qiE 'git[[:space:]].*commit' || exit 0
 
-if printf '%s' "${INPUT}" | grep -qiE 'co-authored-by[^"]{0,40}(claude|anthropic)|generated[[:space:]]+with[^"]{0,40}claude|🤖'; then
+if printf '%s' "${INPUT}" | grep -qiE "${AI_ATTRIB_COAUTHOR_PATTERN}|${AI_ATTRIB_GENERATED_PATTERN}"; then
   {
     echo "BLOCKED: this git commit contains AI attribution."
     echo "Per AGENTS.md §5: no Co-Authored-By: Claude/Anthropic trailers,"

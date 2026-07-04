@@ -47,16 +47,22 @@ BASE_BRANCH="${PRE_PUSH_BASE_BRANCH:-origin/main}"
 # misconfiguration should fail loudly, not scan zero commits and pass.
 STRICT="${AI_ATTRIBUTION_STRICT:-0}"
 
+# Pattern vocabulary is shared with scripts/hooks/block-ai-attribution-commit.sh
+# via scripts/lib/ai-attribution-patterns.sh — see that file for why.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/ai-attribution-patterns.sh
+source "${SCRIPT_DIR}/lib/ai-attribution-patterns.sh"
+
 # Scan 1 pattern — matched against PARSED TRAILERS only. The grep is
 # case-insensitive; the pattern allows flexible whitespace because
 # canonical trailers use exactly one space but obfuscation attempts
 # might vary.
-TRAILER_PATTERN='co-authored-by[[:space:]]*:[[:space:]]*(claude|anthropic)'
+TRAILER_PATTERN="${AI_ATTRIB_COAUTHOR_PATTERN}"
 
 # Scan 2 pattern — matched against every line of the full commit
 # message body, anchored at line start (a "Generated with" footer is
 # always its own line; prose mentions mid-sentence don't match).
-BODY_PATTERN='^[[:space:]]*(🤖[[:space:]]*)?generated[[:space:]]+with[[:space:]]+\[?(claude|anthropic)'
+BODY_PATTERN="^[[:space:]]*${AI_ATTRIB_GENERATED_PATTERN}"
 
 # Best-effort fetch so the comparison range is accurate. Don't fail the
 # scan if the fetch fails (offline, no remote, etc) — the scan still
