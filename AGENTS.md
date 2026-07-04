@@ -4,7 +4,7 @@ This file is the contract between the human maintainer and the AI coding agent o
 
 `CLAUDE.md` at the root (and in each per-package overlay) is a symlink to this file, so Claude Code's conventional discovery path keeps working unchanged.
 
-Keep this file under 500 lines. Detail goes in `docs/decisions/` (ADRs), per-package `AGENTS.md` files, or external skills.
+Keep this file under 500 lines. Detail goes in `docs/adr/` (ADRs), per-package `AGENTS.md` files, or external skills.
 
 ---
 
@@ -16,7 +16,7 @@ Keep this file under 500 lines. Detail goes in `docs/decisions/` (ADRs), per-pac
 - **Differentiator:** `<what makes this defensible / what nobody else does well>`.
 - **Phase:** `<1A / MVP / etc>`. Target: `<TBD or specific date>`; no time pressure; ship when ready.
 - **Tracker:** `<Linear / GitHub Issues / etc>` — `<workspace / team / project>`.
-- **Read first:** `PROJECT.md` (product scope), `docs/decisions/0000-architecture-overview.md` (system shape).
+- **Read first:** `PROJECT.md` (product scope), `docs/adr/0000-architecture-overview.md` (system shape).
 
 ### Repo structure
 
@@ -29,7 +29,7 @@ packages/
   shared/     ← cross-platform code (hooks, utils, types, schemas)
   ui/         ← React components for web
 docs/
-  decisions/        ← ADRs
+  adr/        ← ADRs
   north-star-kickoff.md  ← pointer to the /north-star skill that fills PROJECT.md's North Star
 scripts/      ← project-level scripts (gates, hooks)
 .claude/
@@ -90,7 +90,7 @@ Before doing any of these, pause and confirm with the human in the chat:
 - **Touching auth, JWT handling, session management, or privacy-control code.**
 - **Changing consent, deletion, or privacy-control flows** — cookie/consent banner UX, account deletion routes, region / age-verification columns, analytics opt-in/out wiring, any new cookie or persisted user preference, DSAR (Article 15/17/20) handling. ADRs on privacy compliance are law here; wrong defaults are legally significant.
 - **Introducing a new cross-cutting pattern** (a shared base class, a middleware, a global state slice).
-- **Deleting or renaming anything in `docs/decisions/`.**
+- **Deleting or renaming anything in `docs/adr/`.**
 - **Calling an external API from new code paths** — confirm rate limits, caching, and error handling before adding.
 - **Adding new external ingress** — webhooks, OAuth callbacks, public POST/PUT routes outside the protected API surface. New ingress is new attack surface. Confirm: auth model (signing secret / HMAC / OAuth state), idempotency, rate-limit posture, and the failure mode if the endpoint is hit during an incident.
 - **Processing user data without an explicit user action** — nightly recompute jobs over user histories, behavioural-signal aggregation, ML training inputs, batch updates triggered by upstream webhooks. Read-on-request from a logged-in user is fine; background work over user data needs confirmation because the user isn't there to consent in the moment.
@@ -315,10 +315,11 @@ No emoji. No AI-attribution.
 | `packages/*/AGENTS.md` (`packages/*/CLAUDE.md` symlinks here) | Package-specific rules; inherits this file | Team + AI |
 | `docs/north-star-kickoff.md` | Pointer to the standalone `/north-star` skill (the ritual that fills `PROJECT.md`'s North Star block) | Team + AI |
 | `.claude/commands/`, `.pi/prompts/` | Harness-specific command files; canonical bodies live elsewhere and are symlinked | AI |
-| `docs/decisions/` | ADRs (architecture decision records), numbered, chronological | Team |
+| `docs/adr/` | ADRs (architecture decision records), numbered, chronological | Team |
 | `docs/runbooks/` | One-page-per-vendor incident references — what breaks, manual fallback, status pages, key rotation | Team |
 | `DEPS.md` | One-line justification per npm dependency | Team |
 | `PROJECT.md` | Product brief; what we're building, scope | Team |
+| `CONTEXT.md` | Domain language — the terms code, tickets, and ADRs commit to | Team + AI |
 | `LEARNED.md` | Sharp edges, gotchas, non-obvious behaviour — append when something costs >15 min to diagnose; the "what to do next time" file | Team + AI |
 | `README.md` | How to set up + run | Anyone |
 | `.personal/` *(gitignored)* | Human's private notes, scratch | Human only |

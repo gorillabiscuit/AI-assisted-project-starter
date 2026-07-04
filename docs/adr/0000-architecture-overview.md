@@ -46,5 +46,5 @@ the data stores, the third-party integrations, and the boundaries between
 ## Related
 
 - `PROJECT.md` — product brief that drove this shape
-- `docs/decisions/QUEUE.md` — pending stack-selection ADRs that refine this overview
+- `docs/adr/QUEUE.md` — pending stack-selection ADRs that refine this overview
 - Future ADRs 0001–0099 — each picks a specific library / pattern that fits inside this shape

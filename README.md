@@ -22,7 +22,7 @@ scaffolding is clearly marked.
 - Harness command layout — `.claude/commands/` for Claude Code,
   `.pi/prompts/` for Pi, both symlinked to the same canonical doc bodies so
   there's one source of truth.
-- ADR pattern (`docs/decisions/`) + lightweight runbook pattern
+- ADR pattern (`docs/adr/`) + lightweight runbook pattern
   (`docs/runbooks/`).
 - `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons — each
   with the "why this exists / when to update" prose intact. ROADMAP
@@ -75,7 +75,7 @@ rm -rf .git && git init
 #    - PROJECT.md — fill out the rest of the brief; the North Star sharpens
 #      the cut-line.
 #    - package.json `name` field — your project name
-#    - docs/decisions/0000-architecture-overview.md — your macro shape
+#    - docs/adr/0000-architecture-overview.md — your macro shape
 
 # 4. Install deps and run prepare (sets up husky hooks)
 pnpm install
@@ -114,6 +114,7 @@ amendment to PROJECT.md, not a replacement.
 ├── CLAUDE.md              Symlink to AGENTS.md (Claude Code discovery).
 ├── KICKOFF.md             What the first session should do; remove once it has.
 ├── PROJECT.md             Product brief skeleton with ## North Star block.
+├── CONTEXT.md             Domain-language skeleton — terms the code commits to.
 ├── DEPS.md                Per-dependency justification, one line each.
 ├── LEARNED.md             Sharp-edges journal — append when something costs >15 min.
 ├── README.md              You are here.
@@ -121,7 +122,7 @@ amendment to PROJECT.md, not a replacement.
 ├── docs/
 │   ├── ROADMAP.md         Sequenced milestone view; each milestone carries a North Star linkage line.
 │   ├── north-star-kickoff.md  Pointer to the standalone north-star skill (ritual no longer ships here).
-│   ├── decisions/
+│   ├── adr/
 │   │   ├── README.md      ADR index + format reference.
 │   │   ├── _template.md   Empty ADR — copy this when adding one.
 │   │   ├── QUEUE.md       Strawman decisions awaiting human review.
@@ -180,8 +181,8 @@ the project-specific content begins:
 | `packages/shared/AGENTS.md` (and its `CLAUDE.md` symlink) | Platform-agnostic rule + banned patterns | Project-specific anti-patterns if any |
 | `PROJECT.md` | Section headings + the `## North Star` block scaffold | Fill the North Star block via `/north-star` BEFORE writing the rest; then replace skeleton content below |
 | `docs/north-star-kickoff.md` | The pointer to the standalone north-star skill | Nothing (the ritual lives in the skill repo now) |
-| `docs/decisions/0000-architecture-overview.md` | The ADR-0000 structure | The ASCII diagram + every choice |
-| `docs/decisions/QUEUE.md` | The intro prose explaining the queue | Empty until you have pending stack-selection ADRs |
+| `docs/adr/0000-architecture-overview.md` | The ADR-0000 structure | The ASCII diagram + every choice |
+| `docs/adr/QUEUE.md` | The intro prose explaining the queue | Empty until you have pending stack-selection ADRs |
 | `package.json` | Scripts block + devDependencies | `name` field |
 | `eslint.config.mjs` | All rule blocks | The `packages/shared` rule may need to point at your platform-agnostic package, if any |
 

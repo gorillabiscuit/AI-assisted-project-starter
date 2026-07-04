@@ -28,7 +28,7 @@ The starter gave you:
 - `docs/north-star-kickoff.md` + `/north-star` command in both harnesses
 - `.claude/commands/pre-pr.md` + `.pi/prompts/pre-pr.md` (`/pre-pr` review)
 - `scripts/scan-ai-attribution.sh` + `.husky/pre-push` (AI-attribution gate)
-- `docs/decisions/` (ADR pattern + `_template.md`)
+- `docs/adr/` (ADR pattern + `_template.md`)
 - `docs/runbooks/` (per-vendor incident reference pattern)
 - `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons (the last with a `## North Star` block to be filled on kickoff)
 - TypeScript strict baseline, ESLint flat config, Prettier, Vitest, husky+lint-staged
@@ -68,7 +68,7 @@ Don't accept the skeleton silently — make the human articulate every section. 
 
 ### 1.2 Architecture overview
 
-Open `docs/decisions/0000-architecture-overview.md` and fill it in. This is the macro shape — subsequent ADRs refine specific choices. Don't litigate every library; lay out the components and the data flow between them.
+Open `docs/adr/0000-architecture-overview.md` and fill it in. This is the macro shape — subsequent ADRs refine specific choices. Don't litigate every library; lay out the components and the data flow between them.
 
 ### 1.3 Stack-selection ADRs
 
@@ -89,7 +89,7 @@ Walk through these decisions with the human, one at a time. Suggested order (ski
 13. Privacy compliance approach (GDPR — DSAR endpoints, consent flow)
 14. *Project-specific decisions* (e.g. ML inference, vector store, payment provider, etc)
 
-For each: write a real ADR using `docs/decisions/_template.md` as `000X-<slug>.md`. Status = "Accepted". Commit each as its own commit (`docs(adr): accept ADR-0001 monorepo tool`).
+For each: write a real ADR using `docs/adr/_template.md` as `000X-<slug>.md`. Status = "Accepted". Commit each as its own commit (`docs(adr): accept ADR-0001 monorepo tool`).
 
 ### 1.4 Update the working contract
 

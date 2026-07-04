@@ -26,7 +26,7 @@ Spawn an Explore sub-agent. The sub-agent must NOT see this conversation's imple
 
 Brief the sub-agent:
 
-> Read `AGENTS.md`, the relevant ADRs in `docs/decisions/`, the per-package `AGENTS.md` files for any package this PR touches, and the current `git diff origin/main...HEAD`.
+> Read `AGENTS.md`, the relevant ADRs in `docs/adr/`, the per-package `AGENTS.md` files for any package this PR touches, and the current `git diff origin/main...HEAD`.
 >
 > Look for: rule violations (banned patterns from §3, missing ADRs for architectural choices, missing `DEPS.md` entries for new deps, cross-package import violations from the per-package AGENTS.md files, any moat-package purity rules), category/naming/scope mismatches, brittleness (hardcoded dates, magic strings, paths that age badly), documentation drift (broken cross-references), things that pass the gates but a senior reviewer would flag.
 >
