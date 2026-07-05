@@ -23,11 +23,22 @@ Run `git diff origin/main...HEAD`. Tag every chunk: Scaffolding / Decision / Log
 
 ## Step 3 — Pessimistic meta-check (fresh sub-agent)
 
-Spawn the **`pessimistic-reviewer`** subagent (defined in `.claude/agents/pessimistic-reviewer.md`). It reviews cold — it must NOT see this conversation's implementation context; its agent definition carries the full review brief (rules sweep, brittleness, doc drift, Definitely/Likely/Maybe/Looks-clean categories).
+Spawn the **`pessimistic-reviewer`** subagent (defined in `.claude/agents/pessimistic-reviewer.md`). It reviews cold — it must NOT see this conversation's implementation context; its agent definition carries the full review brief (rules sweep, brittleness, doc drift, Definitely/Likely/Maybe/Looks-clean categories) AND the North Star trace review (TRACES / TENUOUS / DOES-NOT-TRACE per commit, against `PROJECT.md`'s Metric).
 
-In your spawn message, give it only: the ticket reference and any project-specific areas of concern. Nothing about how the implementation went.
+In your spawn message, give it only: the ticket reference and any project-specific areas of concern. Nothing about how the implementation went — and in particular, NOT your own trace justifications for the commits. The trace review scores whether a trace survives *independent* review; feeding the reviewer your reasoning would grade your own homework.
 
-Resolution rule: every Definitely and Likely is fixed in the diff or has a Review-Note trailer documenting why not. Maybes get a one-line decision (fix / Review-Note / accept-as-is).
+Resolution rule: every Definitely and Likely is fixed in the diff or has a Review-Note trailer documenting why not. Maybes get a one-line decision (fix / Review-Note / accept-as-is). The trace share (`N/M commits TRACE`) is reported verbatim in the step 8 handoff; each DOES-NOT-TRACE commit needs a human decision — rework it, drop it from the branch, or override the reviewer with a stated reason.
+
+### Optional per-commit headless judge (default OFF)
+
+For projects that want per-commit trace scoring outside pre-PR (e.g. from a PostToolUse or pre-push hook), a headless variant works:
+
+```bash
+git show --stat --patch HEAD | claude -p --model claude-haiku-4-5-20251001 \
+  "Read the ## North Star block in PROJECT.md, then classify this commit as TRACES, TENUOUS, or DOES-NOT-TRACE against its Metric, with a one-sentence justification."
+```
+
+This is deliberately NOT wired by default: it costs a model call per commit (latency + spend), and the constraint that matters is preserved either way — the judge must be a **cold context**, never the session that authored the commits grading its own traces. If you enable it, use a separate cheap model as shown, not the implementing session.
 
 ## Step 4 — Acceptance-criteria mapping
 
