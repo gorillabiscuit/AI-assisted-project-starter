@@ -9,6 +9,15 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/block-ai-attribution-commit.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/scripts/hooks/block-unstarred-source-edit.sh\""
+          }
+        ]
       }
     ]
   }
