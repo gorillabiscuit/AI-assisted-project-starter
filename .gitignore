@@ -49,8 +49,10 @@ android/.gradle/
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 # Claude Code skill symlinks — restored by `npx skills experimental_install`
-# from skills-lock.json (the lock file IS tracked).
-.claude/skills/
+# from skills-lock.json (the lock file IS tracked). Repo-authored skills
+# (pre-pr) are re-included explicitly and ARE tracked.
+.claude/skills/*
+!.claude/skills/pre-pr/
 
 # Skills installed by `npx skills add` — restored from skills-lock.json,
 # same pattern as node_modules / package-lock.json. Lock file tracked,

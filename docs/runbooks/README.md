@@ -44,7 +44,7 @@ enough to warrant its own ADR or on-call doc, not a longer runbook.
 ```markdown
 # Runbook: `<Vendor>`
 
-**What it is:** `<one-line role in our stack>`. Per [ADR-XXXX](../decisions/XXXX-slug.md).
+**What it is:** `<one-line role in our stack>`. Per [ADR-XXXX](../adr/XXXX-slug.md).
 
 ## What breaks if it's down
 

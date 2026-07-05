@@ -5,7 +5,7 @@
   "description": "Monorepo starter with the AGENTS.md working contract, multi-harness command layout (Claude Code + Pi), product North Star kickoff, ADR pattern, AI-attribution scanner, and pre-PR review flow baked in.",
   "packageManager": "pnpm@10.33.3",
   "engines": {
-    "node": ">=20.10.0"
+    "node": ">=24.0.0"
   },
   "scripts": {
     "dev": "pnpm -r --parallel dev",
@@ -20,15 +20,15 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
-    "@types/node": "^20.10.0",
+    "@types/node": "^24.0.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.0",
     "globals": "^15.14.0",
     "husky": "^9.1.0",
     "lint-staged": "^15.0.0",
     "prettier": "^3.4.0",
-    "typescript": "^5.7.0",
+    "typescript": "^6.0.0",
     "typescript-eslint": "^8.20.0",
-    "vitest": "^3.0.0"
+    "vitest": "^4.1.0"
   }
 }

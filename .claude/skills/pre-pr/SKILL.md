@@ -1,5 +1,6 @@
 ---
-description: Run the pre-PR review per AGENTS.md §7
+name: pre-pr
+description: Run the full pre-PR review per AGENTS.md §7 — gates, tagged diff walk, pessimistic meta-check, acceptance-criteria mapping, commit hygiene, rebase status, PR-description draft. Use when the human says "ship it", "ready to PR", "open the PR", "pre-PR check", or invokes /pre-pr.
 ---
 
 You are running the pre-PR review per `AGENTS.md §7`. Do all of the following inline. Do not ask the human to type commands or run scripts — you have Bash access; run things yourself.
@@ -22,25 +23,9 @@ Run `git diff origin/main...HEAD`. Tag every chunk: Scaffolding / Decision / Log
 
 ## Step 3 — Pessimistic meta-check (fresh sub-agent)
 
-Spawn an Explore sub-agent. The sub-agent must NOT see this conversation's implementation context — it reviews cold.
+Spawn the **`pessimistic-reviewer`** subagent (defined in `.claude/agents/pessimistic-reviewer.md`). It reviews cold — it must NOT see this conversation's implementation context; its agent definition carries the full review brief (rules sweep, brittleness, doc drift, Definitely/Likely/Maybe/Looks-clean categories).
 
-Brief the sub-agent:
-
-> Read `AGENTS.md`, the relevant ADRs in `docs/decisions/`, the per-package `AGENTS.md` files for any package this PR touches, and the current `git diff origin/main...HEAD`.
->
-> Look for: rule violations (banned patterns from §3, missing ADRs for architectural choices, missing `DEPS.md` entries for new deps, cross-package import violations from the per-package AGENTS.md files, any moat-package purity rules), category/naming/scope mismatches, brittleness (hardcoded dates, magic strings, paths that age badly), documentation drift (broken cross-references), things that pass the gates but a senior reviewer would flag.
->
-> Bias toward suspicion. **Assume at least three issues missed**; if you find fewer than three, look harder before concluding.
->
-> Categorise findings:
-> - **Definitely-issue** — clear correctness/contradiction; must fix
-> - **Likely-issue** — strong indication; fix or document why not
-> - **Maybe-issue** — judgment call; surface for human decision
-> - **Looks-clean** — areas you specifically checked and found no issue
->
-> Be specific: file path + line number + quoted snippet per finding. Don't tell me "looks good overall" — tell me exactly what you checked and what you found.
->
-> Under 700 words.
+In your spawn message, give it only: the ticket reference and any project-specific areas of concern. Nothing about how the implementation went.
 
 Resolution rule: every Definitely and Likely is fixed in the diff or has a Review-Note trailer documenting why not. Maybes get a one-line decision (fix / Review-Note / accept-as-is).
 
@@ -65,7 +50,7 @@ Then check the full diff for anything outside the ticket scope.
 
 ## Step 7 — PR description draft
 
-Per AGENTS.md §9.5 — three blocks:
+Three blocks — this is the canonical PR-description template (AGENTS.md §9.5 points here):
 
 ```markdown
 ## Summary
@@ -110,6 +95,6 @@ End the handoff with a short concrete list:
 1. Stage and commit any final changes (one logical change per commit per §5).
 2. `git push`. The pre-push hook automatically runs the AI-attribution scan via `.husky/pre-push` → `bash scripts/scan-ai-attribution.sh`.
 3. Output the PR-creation URL inline (GitHub: run `gh pr create` if the user has explicitly OK'd it, otherwise output the URL `https://github.com/<owner>/<repo>/compare/main...<branch>?expand=1`).
-4. Output the §9.5 PR description draft inline (the same one from step 7), ready to copy.
+4. Output the step 7 PR description draft inline, ready to copy.
 
 The human clicks the URL, copies the description, pastes into the PR form, clicks Create.

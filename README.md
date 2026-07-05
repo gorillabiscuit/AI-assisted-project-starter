@@ -19,17 +19,24 @@ scaffolding is clearly marked.
   [gorillabiscuit/north-star-skill](https://github.com/gorillabiscuit/north-star-skill)),
   so the first thing a new project does is pick the single metric every
   feature must trace to.
-- Harness command layout — `.claude/commands/` for Claude Code,
-  `.pi/prompts/` for Pi, both symlinked to the same canonical doc bodies so
-  there's one source of truth.
-- ADR pattern (`docs/decisions/`) + lightweight runbook pattern
+- Harness layout — `.claude/skills/` for Claude Code (the current skill
+  format; `.claude/commands/` is deprecated upstream and holds only the
+  north-star pointer stub), `.pi/prompts/` for Pi, symlinked to the same
+  canonical bodies so there's one source of truth.
+- Defined subagents (`.claude/agents/`) — `test-writer` (Approach B test
+  isolation, structural not honour-system) and `pessimistic-reviewer`
+  (the cold-context pre-PR meta-check).
+- ADR pattern (`docs/adr/`) + lightweight runbook pattern
   (`docs/runbooks/`).
 - `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons — each
   with the "why this exists / when to update" prose intact. ROADMAP
   milestones carry a `North Star linkage:` line.
-- AI-attribution pre-push scanner (`scripts/scan-ai-attribution.sh`) wired
-  into `.husky/pre-push` so AI-co-author trailers can never reach a PR.
-- `/pre-pr` command (works in both harnesses) that runs the full §7
+- Three-layer AI-attribution defence: a Claude Code commit-time hook
+  (`.claude/settings.json` + `scripts/hooks/block-ai-attribution-commit.sh`),
+  the pre-push scanner (`scripts/scan-ai-attribution.sh` via
+  `.husky/pre-push`), and a CI re-scan (`.github/workflows/ci.yml`) that
+  catches `--no-verify` bypasses. Trailers AND "Generated with" footers.
+- `/pre-pr` skill (works in both harnesses) that runs the full §7
   pre-PR review inline: gates, diff walk, sub-agent meta-check, AC
   mapping, commit hygiene, rebase status, PR-description draft.
 - TypeScript strict baseline (`noUncheckedIndexedAccess`,
@@ -75,7 +82,7 @@ rm -rf .git && git init
 #    - PROJECT.md — fill out the rest of the brief; the North Star sharpens
 #      the cut-line.
 #    - package.json `name` field — your project name
-#    - docs/decisions/0000-architecture-overview.md — your macro shape
+#    - docs/adr/0000-architecture-overview.md — your macro shape
 
 # 4. Install deps and run prepare (sets up husky hooks)
 pnpm install
@@ -114,6 +121,7 @@ amendment to PROJECT.md, not a replacement.
 ├── CLAUDE.md              Symlink to AGENTS.md (Claude Code discovery).
 ├── KICKOFF.md             What the first session should do; remove once it has.
 ├── PROJECT.md             Product brief skeleton with ## North Star block.
+├── CONTEXT.md             Domain-language skeleton — terms the code commits to.
 ├── DEPS.md                Per-dependency justification, one line each.
 ├── LEARNED.md             Sharp-edges journal — append when something costs >15 min.
 ├── README.md              You are here.
@@ -121,7 +129,7 @@ amendment to PROJECT.md, not a replacement.
 ├── docs/
 │   ├── ROADMAP.md         Sequenced milestone view; each milestone carries a North Star linkage line.
 │   ├── north-star-kickoff.md  Pointer to the standalone north-star skill (ritual no longer ships here).
-│   ├── decisions/
+│   ├── adr/
 │   │   ├── README.md      ADR index + format reference.
 │   │   ├── _template.md   Empty ADR — copy this when adding one.
 │   │   ├── QUEUE.md       Strawman decisions awaiting human review.
@@ -130,13 +138,18 @@ amendment to PROJECT.md, not a replacement.
 │       └── README.md      Per-vendor incident reference pattern.
 │
 ├── .claude/
-│   └── commands/
-│       ├── pre-pr.md      `/pre-pr` — full §7 inline (canonical).
+│   ├── skills/
+│   │   └── pre-pr/
+│   │       └── SKILL.md   `/pre-pr` — full §7 inline (canonical). Repo-authored; tracked despite the installed-skills gitignore.
+│   ├── agents/
+│   │   ├── test-writer.md           Approach B isolated test writer (AGENTS.md §8.1).
+│   │   └── pessimistic-reviewer.md  Cold-context pre-PR meta-check (§7 step 3).
+│   └── commands/          Deprecated upstream; holds only the north-star pointer stub.
 │       └── north-star.md  Symlink → docs/north-star-kickoff.md (install pointer; ritual is the north-star skill).
 │
 ├── .pi/
 │   └── prompts/
-│       ├── pre-pr.md      Symlink → .claude/commands/pre-pr.md.
+│       ├── pre-pr.md      Symlink → .claude/skills/pre-pr/SKILL.md.
 │       └── north-star.md  Symlink → docs/north-star-kickoff.md (install pointer; ritual is the north-star skill).
 │
 ├── .husky/
@@ -149,12 +162,16 @@ amendment to PROJECT.md, not a replacement.
 ├── apps/
 │   └── web/
 │       ├── AGENTS.md      Per-package rules overlay (skeleton).
-│       └── CLAUDE.md      Symlink to apps/web/AGENTS.md.
+│       ├── CLAUDE.md      Symlink to apps/web/AGENTS.md.
+│       └── tsconfig.json  Extends tsconfig.base.json — ships upfront so
+│                          ESLint's typed-lint projectService has a
+│                          project to resolve before any .ts file lands.
 │
 ├── packages/
 │   └── shared/
 │       ├── AGENTS.md      Platform-agnostic package overlay (skeleton).
-│       └── CLAUDE.md      Symlink to packages/shared/AGENTS.md.
+│       ├── CLAUDE.md      Symlink to packages/shared/AGENTS.md.
+│       └── tsconfig.json  Same reasoning as apps/web/tsconfig.json.
 │
 ├── eslint.config.mjs      Flat config. Banned-pattern rules enforced.
 ├── tsconfig.base.json     Strict TypeScript baseline.
@@ -180,8 +197,8 @@ the project-specific content begins:
 | `packages/shared/AGENTS.md` (and its `CLAUDE.md` symlink) | Platform-agnostic rule + banned patterns | Project-specific anti-patterns if any |
 | `PROJECT.md` | Section headings + the `## North Star` block scaffold | Fill the North Star block via `/north-star` BEFORE writing the rest; then replace skeleton content below |
 | `docs/north-star-kickoff.md` | The pointer to the standalone north-star skill | Nothing (the ritual lives in the skill repo now) |
-| `docs/decisions/0000-architecture-overview.md` | The ADR-0000 structure | The ASCII diagram + every choice |
-| `docs/decisions/QUEUE.md` | The intro prose explaining the queue | Empty until you have pending stack-selection ADRs |
+| `docs/adr/0000-architecture-overview.md` | The ADR-0000 structure | The ASCII diagram + every choice |
+| `docs/adr/QUEUE.md` | The intro prose explaining the queue | Empty until you have pending stack-selection ADRs |
 | `package.json` | Scripts block + devDependencies | `name` field |
 | `eslint.config.mjs` | All rule blocks | The `packages/shared` rule may need to point at your platform-agnostic package, if any |
 
@@ -191,7 +208,8 @@ Everything else is generic and can stay verbatim.
 
 ## Why these conventions?
 
-A separate doc describes the rationale for each rule in AGENTS.md (e.g. why
-`==` is banned, why ADRs follow this specific format, why tests use
-Approach B for moat code). That history isn't here yet — for now,
-`AGENTS.md` itself has the reasoning inline as comments where it matters.
+The rationale lives inline where each rule does: `AGENTS.md` states per
+rule which AI-specific failure mode it catches, and the config files
+(`eslint.config.mjs`, `scripts/*.sh`, `.claude/settings.json`) carry
+why-comments where the reasoning isn't obvious from the rule itself.
+Project-specific reasoning goes in ADRs as decisions land.

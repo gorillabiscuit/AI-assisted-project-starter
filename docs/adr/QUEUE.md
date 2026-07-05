@@ -16,7 +16,7 @@ These are NOT decisions yet. They're strawmen for the new-session Claude + human
 
 1. **Read each entry below with the human.**
 2. **For each: confirm the recommendation, push back, or pick an alternative.** Don't accept silently — make the human articulate why they agree.
-3. **Write the real ADR file** at `docs/decisions/000X-<title-slug>.md` using `_template.md`. Status = "Accepted". Date = today.
+3. **Write the real ADR file** at `docs/adr/000X-<title-slug>.md` using `_template.md`. Status = "Accepted". Date = today.
 4. **Commit each ADR as its own commit** (`docs(adr): accept ADR-0001 monorepo tool` etc).
 5. **Mark this `QUEUE.md` entry as resolved** by deleting that section and adding a one-liner to `README.md`'s index table.
 

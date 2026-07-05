@@ -4,7 +4,7 @@ This file is the contract between the human maintainer and the AI coding agent o
 
 `CLAUDE.md` at the root (and in each per-package overlay) is a symlink to this file, so Claude Code's conventional discovery path keeps working unchanged.
 
-Keep this file under 500 lines. Detail goes in `docs/decisions/` (ADRs), per-package `AGENTS.md` files, or external skills.
+Keep this file under 500 lines. Detail goes in `docs/adr/` (ADRs), per-package `AGENTS.md` files, or external skills.
 
 ---
 
@@ -16,7 +16,7 @@ Keep this file under 500 lines. Detail goes in `docs/decisions/` (ADRs), per-pac
 - **Differentiator:** `<what makes this defensible / what nobody else does well>`.
 - **Phase:** `<1A / MVP / etc>`. Target: `<TBD or specific date>`; no time pressure; ship when ready.
 - **Tracker:** `<Linear / GitHub Issues / etc>` — `<workspace / team / project>`.
-- **Read first:** `PROJECT.md` (product scope), `docs/decisions/0000-architecture-overview.md` (system shape).
+- **Read first:** `PROJECT.md` (product scope), `docs/adr/0000-architecture-overview.md` (system shape).
 
 ### Repo structure
 
@@ -29,11 +29,13 @@ packages/
   shared/     ← cross-platform code (hooks, utils, types, schemas)
   ui/         ← React components for web
 docs/
-  decisions/        ← ADRs
+  adr/        ← ADRs
   north-star-kickoff.md  ← pointer to the /north-star skill that fills PROJECT.md's North Star
 scripts/      ← project-level scripts (gates, hooks)
 .claude/
-  commands/   ← Claude Code slash commands (e.g. /pre-pr, /north-star)
+  skills/     ← Claude Code skills (e.g. /pre-pr — canonical bodies)
+  agents/     ← defined subagents (test-writer, pessimistic-reviewer)
+  commands/   ← deprecated upstream; only the /north-star pointer stub remains
 .pi/
   prompts/    ← Pi commands (symlinked to the same canonical files)
 ```
@@ -65,6 +67,7 @@ The agent must not do any of these. If instructed to, stop and flag.
 - **No `var`.** `const` by default; `let` if reassigned.
 - **No console.log in committed code.** Use the project logger (introduce one when adding observability). `console.log` is a code-review-blocker.
 - **No silent catch.** `try { ... } catch {}` and `try { ... } catch (e) { /* ignored */ }` both banned. Either log it, re-throw it, or surface it via the error-handling layer — never swallow.
+- **No floating promises.** Every promise is awaited, returned, or explicitly voided with a one-line comment saying why fire-and-forget is safe here. Unawaited promises silently drop errors — a classic AI-generated bug that passes non-typed lint. Enforced via `@typescript-eslint/no-floating-promises` (typed lint).
 - **No `as` type casts** without a one-line comment explaining why the type system can't verify it.
 - **No hallucinated imports.** If the symbol doesn't exist in a real npm package at the version we have installed, don't write code calling it. TypeScript and ESLint catch most cases but verify.
 - **No PII / secrets in source, tests, or fixtures.** Use env vars and `.env.example` placeholders.
@@ -90,7 +93,7 @@ Before doing any of these, pause and confirm with the human in the chat:
 - **Touching auth, JWT handling, session management, or privacy-control code.**
 - **Changing consent, deletion, or privacy-control flows** — cookie/consent banner UX, account deletion routes, region / age-verification columns, analytics opt-in/out wiring, any new cookie or persisted user preference, DSAR (Article 15/17/20) handling. ADRs on privacy compliance are law here; wrong defaults are legally significant.
 - **Introducing a new cross-cutting pattern** (a shared base class, a middleware, a global state slice).
-- **Deleting or renaming anything in `docs/decisions/`.**
+- **Deleting or renaming anything in `docs/adr/`.**
 - **Calling an external API from new code paths** — confirm rate limits, caching, and error handling before adding.
 - **Adding new external ingress** — webhooks, OAuth callbacks, public POST/PUT routes outside the protected API surface. New ingress is new attack surface. Confirm: auth model (signing secret / HMAC / OAuth state), idempotency, rate-limit posture, and the failure mode if the endpoint is hit during an incident.
 - **Processing user data without an explicit user action** — nightly recompute jobs over user histories, behavioural-signal aggregation, ML training inputs, batch updates triggered by upstream webhooks. Read-on-request from a logged-in user is fine; background work over user data needs confirmation because the user isn't there to consent in the moment.
@@ -108,7 +111,11 @@ Before doing any of these, pause and confirm with the human in the chat:
 - **No `Co-Authored-By: Claude`** or any AI co-author trailer. Commit as the human maintainer; no AI authorship claims anywhere in commit metadata.
 - **No "Generated with Claude Code" footers.**
 
-The pre-push hook (`scripts/scan-ai-attribution.sh`, wired in `.husky/pre-push`) automatically aborts pushes with AI-attribution trailers.
+Three layered gates enforce this deterministically — the rule does not rely on the agent remembering it:
+
+1. **Commit time** — a Claude Code `PreToolUse` hook (`.claude/settings.json` → `scripts/hooks/block-ai-attribution-commit.sh`) blocks `git commit` commands whose message carries attribution, before it enters history.
+2. **Push time** — `scripts/scan-ai-attribution.sh` (wired in `.husky/pre-push`) scans every branch commit and aborts the push.
+3. **CI** — the same scan re-runs against the PR base in `.github/workflows/ci.yml`, catching `--no-verify` bypasses and clones where husky was never installed.
 
 ### Review-Note trailers
 
@@ -159,43 +166,17 @@ The human must explicitly acknowledge they've read each Security or External chu
 
 Pre-PR review is something the **agent does on demand**, not a checklist for the human to type commands through.
 
-### Trigger
+**Trigger:** when the human says one of `ship it`, `ready to PR`, `open the PR`, `submit the PR for TICKET-X`, `let's submit`, `pre-PR check`, or invokes `/pre-pr` — the agent runs the full review inline.
 
-When the human says one of: `ship it`, `ready to PR`, `open the PR`, `submit the PR for TICKET-X`, `let's submit`, `pre-PR check`, or invokes `/pre-pr` — the agent runs the full review inline. No scripts for the human to launch, no commands for the human to copy-paste.
+**The procedure is the `/pre-pr` skill** (`.claude/skills/pre-pr/SKILL.md` — canonical; `.pi/prompts/pre-pr.md` symlinks to it). In brief: gates → tagged diff walk (§6) → pessimistic meta-check via the `pessimistic-reviewer` subagent → acceptance-criteria mapping → commit hygiene → rebase status → PR-description draft → one consolidated handoff. Don't re-derive the steps from this summary; follow the skill.
 
-### What the agent does, in order
-
-1. **Run the gates.** `pnpm typecheck && pnpm lint && pnpm test` (or `pnpm preflight` which chains them). Report PASS/FAIL summary. If anything fails, stop and fix before continuing.
-2. **Walk the diff.** `git diff origin/main...HEAD`. Tag every chunk Scaffolding / Decision / Logic / External / Security per §6 (apply §6.1 escalation + §6.2 acknowledgement).
-3. **Pessimistic meta-check.** Spawn a fresh sub-agent (Explore type, no view of this conversation). Brief: *"Read AGENTS.md, the relevant ADRs, and the branch diff (`git diff origin/main...HEAD`). Look for: rule violations (banned patterns, missing ADRs, missing DEPS.md entries), category/naming/scope mismatches, brittleness, things that pass the gates but a senior reviewer would flag. Report as Definitely-issue / Likely-issue / Maybe-issue / Looks-clean — file:line + quoted snippet per finding. Bias toward suspicion; assume at least three issues missed."* Resolution rule: every Definitely and Likely is fixed in the diff or has a Review-Note trailer. Maybes get a one-line decision.
-4. **Acceptance-criteria mapping.** Read the ticket. For each AC bullet, point at file:line or "not satisfied".
-5. **Commit hygiene + scope check.** One logical change per commit (per §5)? New deps in their own commits? Anything in the diff outside the ticket's scope?
-6. **Rebase check.** `git rev-list --left-right --count origin/main...HEAD`. Flag if behind.
-7. **PR description draft.** Three blocks (Summary / Test plan / Notes for reviewer). The Test plan **must** include a "Manual verification commands" subsection listing the exact actions a reviewer should run to exercise this PR's surface end-to-end. Pure-refactor PRs skip the subsection but say so explicitly.
-8. **Output one consolidated handoff** inline (sections 1–7 above as one markdown document).
-9. **Surface what only the human can do.** Three items, listed concretely: read the chunks tagged Decision/Logic/External/Security; run the manual verification commands; sign off with `ship it` or push back.
-
-### What the human does
-
-Three things, all irreducible:
+**What the human does** — three things, all irreducible:
 
 1. **Read the chunks the agent flagged Decision / Logic / External / Security.** Eyes-on. The agent can't tell when its own categorisation was off — the human can.
 2. **Run the manual verification commands** from the handoff. Skip only if the agent declared "no human-visible surface" (pure refactor) — and confirm that's true.
-3. **Say `ship it`** (or `fix X first`).
+3. **Say `ship it`** (or `fix X first`). On `ship it` the agent commits, pushes (pre-push hook re-scans for attribution), and outputs the PR-creation URL + description.
 
-### What happens on `ship it`
-
-Agent does, in order:
-
-1. Stages and commits any final changes (one logical change per commit per §5).
-2. `git push`. The pre-push hook automatically runs the AI-attribution scan and aborts on any `Co-Authored-By: Claude` / Anthropic / "Generated with Claude Code" trailer.
-3. Outputs the GitHub PR-creation URL inline (or runs `gh pr create` if the user explicitly OK'd that, with the description from step 7 of the handoff).
-
-### Why this design
-
-The agent does everything programmatic. The human does only what's irreducibly human: read the diff, exercise the surface, decide. No scripts to launch. No commands to type beyond the natural-language trigger and `ship it`.
-
-The only invisible automation is the **pre-push hook** (`scripts/scan-ai-attribution.sh` wired via `.husky/pre-push`). One-time install per clone (run by `pnpm install` if `prepare` script is set up — see README).
+**Why this design:** the agent does everything programmatic. The human does only what's irreducibly human: read the diff, exercise the surface, decide.
 
 ---
 
@@ -214,10 +195,10 @@ After every meaningful change — not just pre-PR — run the narrowest applicab
 |---|---|---|
 | **Scaffolding** (config, types, package boilerplate) | None | Nothing to rubber-stamp |
 | **Simple Logic** (mechanical, narrow contract) | **A** — in-turn discipline | Agent writes impl, commits, then writes tests against ONLY the contract / docstring / ADR — not the implementation file |
-| **Complex Logic** (anything moat-relevant, anything with subtle correctness invariants) | **B** — sub-agent isolation | Agent writes + commits implementation. Then spawns a fresh sub-agent with **only** the contract, ticket, and AGENTS.md — sub-agent writes tests in a genuinely separate context. Agent reviews output, commits. |
+| **Complex Logic** (anything moat-relevant, anything with subtle correctness invariants) | **B** — sub-agent isolation | Agent writes + commits implementation. Then spawns the **`test-writer` subagent** (`.claude/agents/test-writer.md`) with **only** the contract and ticket in its brief — it writes tests in a genuinely separate context and is instructed never to open the implementation file. Agent reviews output, commits. |
 | **Pure-logic function with fully-known contract** | **C** — TDD | Tests written **before** implementation; human reviews tests; implementation written to make tests pass. |
 
-Approach B is mandatory for anything in your project's *moat* package — the code that, if it became defensibly valuable, you'd want to productise without rewriting. Rubber-stamp tests there will hide real bugs.
+Approach B is mandatory for anything in your project's *moat* package — the code that, if it became defensibly valuable, you'd want to productise without rewriting. Rubber-stamp tests there will hide real bugs. The isolation is structural, not honour-system: `test-writer` is a defined subagent with its own context, so it cannot inherit the implementing session's assumptions.
 
 ### 8.2 Tools
 
@@ -278,31 +259,7 @@ If any command fails on a clean checkout of `main`, that's a bug — file it.
 
 ### 9.5 PR description template
 
-PR descriptions are not commit-message dumps. Three short blocks:
-
-```
-## Summary
-
-<1–3 bullets, plain English, what changed and why>
-
-## Test plan
-
-- [ ] <reproduction step 1>
-- [ ] <reproduction step 2>
-- [ ] <edge case>
-
-### Manual verification commands
-
-<exact commands or UI actions a reviewer should run to exercise this PR's
-surface end-to-end. If pure refactor with no surface, say so explicitly>
-
-## Notes for reviewer
-
-<acceptance-criteria mappings; any Review-Note trailers from commits;
-anything subtle worth flagging>
-```
-
-No emoji. No AI-attribution.
+PR descriptions are not commit-message dumps. Three short blocks — Summary / Test plan (with a **Manual verification commands** subsection) / Notes for reviewer. The canonical template lives in the `/pre-pr` skill (`.claude/skills/pre-pr/SKILL.md`, step 7); use it verbatim. No emoji. No AI-attribution.
 
 ---
 
@@ -314,11 +271,12 @@ No emoji. No AI-attribution.
 | `apps/*/AGENTS.md` (`apps/*/CLAUDE.md` symlinks here) | Package-specific rules; inherits this file | Team + AI |
 | `packages/*/AGENTS.md` (`packages/*/CLAUDE.md` symlinks here) | Package-specific rules; inherits this file | Team + AI |
 | `docs/north-star-kickoff.md` | Pointer to the standalone `/north-star` skill (the ritual that fills `PROJECT.md`'s North Star block) | Team + AI |
-| `.claude/commands/`, `.pi/prompts/` | Harness-specific command files; canonical bodies live elsewhere and are symlinked | AI |
-| `docs/decisions/` | ADRs (architecture decision records), numbered, chronological | Team |
+| `.claude/skills/`, `.claude/agents/`, `.pi/prompts/` | Repo-authored skills + subagents (canonical); `.pi/prompts/` symlinks to the same bodies. `.claude/commands/` holds only legacy pointer stubs | AI |
+| `docs/adr/` | ADRs (architecture decision records), numbered, chronological | Team |
 | `docs/runbooks/` | One-page-per-vendor incident references — what breaks, manual fallback, status pages, key rotation | Team |
 | `DEPS.md` | One-line justification per npm dependency | Team |
 | `PROJECT.md` | Product brief; what we're building, scope | Team |
+| `CONTEXT.md` | Domain language — the terms code, tickets, and ADRs commit to | Team + AI |
 | `LEARNED.md` | Sharp edges, gotchas, non-obvious behaviour — append when something costs >15 min to diagnose; the "what to do next time" file | Team + AI |
 | `README.md` | How to set up + run | Anyone |
 | `.personal/` *(gitignored)* | Human's private notes, scratch | Human only |

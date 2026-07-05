@@ -26,9 +26,10 @@ The starter gave you:
 
 - `AGENTS.md` (working contract — read end-to-end; `CLAUDE.md` is a symlink to it)
 - `docs/north-star-kickoff.md` + `/north-star` command in both harnesses
-- `.claude/commands/pre-pr.md` + `.pi/prompts/pre-pr.md` (`/pre-pr` review)
+- `.claude/skills/pre-pr/SKILL.md` + `.pi/prompts/pre-pr.md` (`/pre-pr` review)
+- `.claude/agents/` (test-writer + pessimistic-reviewer subagents)
 - `scripts/scan-ai-attribution.sh` + `.husky/pre-push` (AI-attribution gate)
-- `docs/decisions/` (ADR pattern + `_template.md`)
+- `docs/adr/` (ADR pattern + `_template.md`)
 - `docs/runbooks/` (per-vendor incident reference pattern)
 - `LEARNED.md`, `DEPS.md`, `ROADMAP.md`, `PROJECT.md` skeletons (the last with a `## North Star` block to be filled on kickoff)
 - TypeScript strict baseline, ESLint flat config, Prettier, Vitest, husky+lint-staged
@@ -68,28 +69,13 @@ Don't accept the skeleton silently — make the human articulate every section. 
 
 ### 1.2 Architecture overview
 
-Open `docs/decisions/0000-architecture-overview.md` and fill it in. This is the macro shape — subsequent ADRs refine specific choices. Don't litigate every library; lay out the components and the data flow between them.
+Open `docs/adr/0000-architecture-overview.md` and fill it in. This is the macro shape — subsequent ADRs refine specific choices. Don't litigate every library; lay out the components and the data flow between them.
 
 ### 1.3 Stack-selection ADRs
 
-Walk through these decisions with the human, one at a time. Suggested order (skip any that don't apply):
+Walk through the pending decisions with the human, one at a time. **The decision list lives in `docs/adr/QUEUE.md`** — one section per decision, each with a strawman recommendation, rejected alternatives, and change-our-mind signals. Don't duplicate the list here; open the queue and work it top to bottom (it's in rough dependency order; skip any that don't apply).
 
-1. Monorepo tool (turbo / nx / plain pnpm workspaces)
-2. Frontend framework (Next.js / Remix / Vite / Astro / ...)
-3. API surface (tRPC / REST / GraphQL / direct server actions)
-4. Auth provider (Clerk / Auth.js / Supabase / custom)
-5. Database (Postgres / SQLite / specific host)
-6. ORM (Drizzle / Prisma / Kysely / raw SQL)
-7. Job orchestration (Inngest / BullMQ / native cron / ...)
-8. Observability stack (Sentry / PostHog / Datadog / ...)
-9. Hosting platform (Vercel / Fly / Railway / self-hosted)
-10. Styling approach (Tailwind / CSS modules / styled-components)
-11. Component library (shadcn / Radix raw / Mantine / ...)
-12. Testing approach (Vitest only / + Playwright / + MSW)
-13. Privacy compliance approach (GDPR — DSAR endpoints, consent flow)
-14. *Project-specific decisions* (e.g. ML inference, vector store, payment provider, etc)
-
-For each: write a real ADR using `docs/decisions/_template.md` as `000X-<slug>.md`. Status = "Accepted". Commit each as its own commit (`docs(adr): accept ADR-0001 monorepo tool`).
+For each: write a real ADR using `docs/adr/_template.md` as `000X-<slug>.md`. Status = "Accepted". Commit each as its own commit (`docs(adr): accept ADR-0001 monorepo tool`), then delete the resolved QUEUE.md section.
 
 ### 1.4 Update the working contract
 
