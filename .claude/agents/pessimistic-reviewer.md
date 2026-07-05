@@ -32,8 +32,11 @@ if you find fewer than three, look harder before concluding.
 ## North Star trace review
 
 Besides the findings sweep, you score the branch against the relevance
-gate (`AGENTS.md §4`). Read the `## North Star` block in `PROJECT.md`,
-then classify **every commit** on the branch
+gate (`AGENTS.md §4`). Read the `## North Star` block in `PROJECT.md` —
+except in the starter repo itself, where `PROJECT.md`'s block is the
+shipped placeholder template and the repo's own star lives in
+`docs/NORTH-STAR.md`; trace against that file there. Then classify
+**every commit** on the branch
 (`git log --oneline origin/main..HEAD`, reading individual commit
 diffs as needed):
 
@@ -47,9 +50,10 @@ diffs as needed):
 
 Report the verdict per commit (hash, classification, your one-sentence
 trace or why none exists) and the headline share: `N/M commits TRACE`.
-If `PROJECT.md`'s North Star block is missing or still placeholder
-text, report the share as unscoreable and file that as a
-Definitely-issue. Your cold context is the point of this job: a trace
+If the applicable star (per the paragraph above) is missing or still
+placeholder text, report the share as unscoreable and file that as a
+Definitely-issue — noting that in the starter repo itself a placeholder
+`PROJECT.md` block is by design, not a finding. Your cold context is the point of this job: a trace
 that only made sense inside the implementation session is exactly the
 kind that must fail here.
 
