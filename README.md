@@ -19,6 +19,14 @@ scaffolding is clearly marked.
   [gorillabiscuit/north-star-skill](https://github.com/gorillabiscuit/north-star-skill)),
   so the first thing a new project does is pick the single metric every
   feature must trace to.
+- North Star enforcement hooks — the relevance gate is machinery, not
+  just prose: a `PreToolUse` hook
+  (`scripts/hooks/block-unstarred-source-edit.sh`) blocks edits under
+  `apps/` and `packages/` until the North Star block is filled, a
+  `SessionStart` hook (`scripts/hooks/inject-north-star-session-start.sh`)
+  injects the star into context every session, and the `/pre-pr`
+  meta-check scores every branch commit TRACES / TENUOUS /
+  DOES-NOT-TRACE against the Metric.
 - Harness layout — `.claude/skills/` for Claude Code (the current skill
   format; `.claude/commands/` is deprecated upstream and holds only the
   north-star pointer stub), `.pi/prompts/` for Pi, symlinked to the same
