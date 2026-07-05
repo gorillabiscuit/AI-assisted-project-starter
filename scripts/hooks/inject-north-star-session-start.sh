@@ -16,6 +16,12 @@
 # of the block — the agent should know from message one that the edit
 # gate (block-unstarred-source-edit.sh) is armed and why.
 #
+# The Metric is framed in a simple bordered box — the "normal" display
+# of the star. The full ASCII star scene is deliberately NOT shown here:
+# it is the /north-star ritual's finalisation reveal (kickoff or a
+# revise-mode change), shown once when the star is set, not re-flashed
+# every session. Session start just keeps the one line in a clean frame.
+#
 # Always exits 0: a session must never fail to start over this.
 
 set -u
@@ -27,15 +33,30 @@ source "${SCRIPT_DIR}/../lib/north-star-block.sh"
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 PROJECT_MD="${PROJECT_DIR}/PROJECT.md"
 
+# Print one metric sentence inside a plain bordered box. Pure awk so the
+# hook carries no interpreter dependency; wraps to a fixed width.
+metric_box() {
+  awk -v text="$1" 'BEGIN{
+    tw=54
+    n=split(text, w, " "); line=""; nl=0
+    for(i=1;i<=n;i++){ cand=(line==""?w[i]:line" "w[i])
+      if(length(cand)>tw){ L[++nl]=line; line=w[i] } else line=cand }
+    if(line!="") L[++nl]=line
+    b="+"; for(i=0;i<tw+4;i++) b=b"-"; b=b"+"; print b
+    t="N O R T H   S T A R"; pad=(tw+4)-length(t); lp=int(pad/2); rp=pad-lp
+    s="|"; for(i=0;i<lp;i++) s=s"."; s=s t; for(i=0;i<rp;i++) s=s"."; print s"|"
+    printf("|%*s|\n", tw+4, "")
+    for(j=1;j<=nl;j++) printf("|  %-*s  |\n", tw, L[j])
+    printf("|%*s|\n", tw+4, "")
+    print b
+  }'
+}
+
 if north_star_is_filled "${PROJECT_MD}"; then
-  # A star banner over the Metric sentence, if we can render one. Pure
-  # eye-catcher: the full block below is still the substance the agent
-  # reasons against. Any failure (no python3, metric too long, script
-  # error) silently drops the banner — never the block.
   metric=$(north_star_metric "${PROJECT_MD}" 2>/dev/null || true)
-  if [ -n "${metric}" ] && command -v python3 >/dev/null 2>&1; then
-    banner=$(python3 "${SCRIPT_DIR}/../render-north-star-banner.py" "${metric}" 2>/dev/null || true)
-    [ -n "${banner}" ] && printf '%s\n\n' "${banner}"
+  if [ -n "${metric}" ]; then
+    metric_box "${metric}"
+    echo
   fi
   echo "PROJECT.md North Star (every non-trivial task must trace to this — AGENTS.md §4):"
   echo
