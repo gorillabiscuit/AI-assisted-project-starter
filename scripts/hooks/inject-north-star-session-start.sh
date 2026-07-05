@@ -28,6 +28,15 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 PROJECT_MD="${PROJECT_DIR}/PROJECT.md"
 
 if north_star_is_filled "${PROJECT_MD}"; then
+  # A star banner over the Metric sentence, if we can render one. Pure
+  # eye-catcher: the full block below is still the substance the agent
+  # reasons against. Any failure (no python3, metric too long, script
+  # error) silently drops the banner — never the block.
+  metric=$(north_star_metric "${PROJECT_MD}" 2>/dev/null || true)
+  if [ -n "${metric}" ] && command -v python3 >/dev/null 2>&1; then
+    banner=$(python3 "${SCRIPT_DIR}/../render-north-star-banner.py" "${metric}" 2>/dev/null || true)
+    [ -n "${banner}" ] && printf '%s\n\n' "${banner}"
+  fi
   echo "PROJECT.md North Star (every non-trivial task must trace to this — AGENTS.md §4):"
   echo
   north_star_block "${PROJECT_MD}"

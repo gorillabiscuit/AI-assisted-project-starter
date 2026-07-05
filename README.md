@@ -24,8 +24,10 @@ scaffolding is clearly marked.
   (`scripts/hooks/block-unstarred-source-edit.sh`) blocks edits under
   `apps/` and `packages/` until the North Star block is filled, a
   `SessionStart` hook (`scripts/hooks/inject-north-star-session-start.sh`)
-  injects the star into context every session, and the `/pre-pr`
-  meta-check scores every branch commit TRACES / TENUOUS /
+  injects the star into context every session — over an ASCII-art star
+  banner of the Metric (`scripts/render-north-star-banner.py`) so the
+  one line every task traces to is impossible to miss — and the
+  `/pre-pr` meta-check scores every branch commit TRACES / TENUOUS /
   DOES-NOT-TRACE against the Metric.
 - Harness layout — `.claude/skills/` for Claude Code (the current skill
   format; `.claude/commands/` is deprecated upstream and holds only the
