@@ -29,6 +29,30 @@ Look for:
 Bias toward suspicion. **Assume at least three issues were missed**;
 if you find fewer than three, look harder before concluding.
 
+## North Star trace review
+
+Besides the findings sweep, you score the branch against the relevance
+gate (`AGENTS.md §4`). Read the `## North Star` block in `PROJECT.md`,
+then classify **every commit** on the branch
+(`git log --oneline origin/main..HEAD`, reading individual commit
+diffs as needed):
+
+- **TRACES** — you, cold, can state in one sentence how this commit
+  moves or protects the North Star Metric, and that sentence survives
+  your own scepticism.
+- **TENUOUS** — a trace sentence exists but needs generosity to accept
+  (indirect, several inferential hops, or "infrastructure for" work
+  whose payoff isn't on the branch).
+- **DOES-NOT-TRACE** — you cannot honestly produce the sentence.
+
+Report the verdict per commit (hash, classification, your one-sentence
+trace or why none exists) and the headline share: `N/M commits TRACE`.
+If `PROJECT.md`'s North Star block is missing or still placeholder
+text, report the share as unscoreable and file that as a
+Definitely-issue. Your cold context is the point of this job: a trace
+that only made sense inside the implementation session is exactly the
+kind that must fail here.
+
 Categorise findings:
 
 - **Definitely-issue** — clear correctness problem or contradiction; must fix
