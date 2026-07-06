@@ -42,3 +42,20 @@ north_star_is_filled() {
   fi
   return 0
 }
+
+# Prints just the Metric sentence from the North Star block — the one
+# line every task must trace to, and the only line the session banner
+# shows. Handles both the PROJECT.md template form (`**Metric:**`) and
+# the /north-star skill's amendment form (`**Metric.**`): strips the
+# label, markdown backticks, and surrounding whitespace. Returns 1 if
+# no metric line is present.
+north_star_metric() {
+  local file="$1"
+  local block line
+  block=$(north_star_block "${file}") || return 1
+  line=$(printf '%s\n' "${block}" | grep -iE '\*\*Metric[:.]\*\*' | head -1)
+  [ -n "${line}" ] || return 1
+  line=$(printf '%s' "${line}" | sed -E 's/^.*\*\*Metric[:.]\*\*[[:space:]]*//; s/`//g; s/^[[:space:]]+//; s/[[:space:]]+$//')
+  [ -n "${line}" ] || return 1
+  printf '%s\n' "${line}"
+}
