@@ -23,6 +23,59 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm preflight
 
+  dependency-audit:
+    # Third gate class: known-vulnerable dependencies. The quality gates
+    # (preflight) catch code we wrote; this catches code we imported.
+    # `pnpm audit` checks the lockfile against the npm advisory DB —
+    # no third-party action, no token, nothing to configure.
+    #
+    # --audit-level=high: fail on high/critical only. Moderate advisories
+    # in dev tooling are near-constant background noise; a gate that cries
+    # wolf gets `continue-on-error`d within a month and then protects
+    # nothing. If a high finding is a true false-positive for this
+    # project, add a documented override in package.json
+    # (pnpm.auditConfig.ignoreCves) in its own reviewed commit — never
+    # loosen the level here.
+    #
+    # Projects with stricter needs (SBOMs, license policy, transitive
+    # reachability) should graduate to osv-scanner or socket.dev via an
+    # ADR — see docs/adr/QUEUE.md "Deployment pipeline" entry.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --audit-level=high
+
+  # deploy (intentionally absent — this is a slot, not an implementation)
+  #
+  # The starter is deploy-target-agnostic: a Vercel app, an AWS CDK stack,
+  # an npm package, and a static site all deploy differently, and shipping
+  # any one of them here would tax every project that chose another.
+  # What generalises is the PATTERN, so new projects should add it early
+  # (it's a seeded decision in docs/adr/QUEUE.md → "Deployment pipeline"):
+  #
+  #   deploy-staging:
+  #     needs: [preflight, dependency-audit]     # quality gates block deploys
+  #     if: github.ref == 'refs/heads/main'      # staging tracks main
+  #     ...platform-specific steps...
+  #
+  #   deploy-production:
+  #     needs: [preflight, dependency-audit]
+  #     if: startsWith(github.ref, 'refs/tags/') # prod is an explicit act:
+  #     environment: production                  # tag + GitHub environment
+  #     ...platform-specific steps...            # approval, never a side
+  #                                              # effect of merging
+  #
+  # Rules that hold on every platform: deploys depend on ALL gate jobs;
+  # staging is continuous, production is deliberate; rollback is a
+  # documented runbook (docs/runbooks/) before the first prod deploy,
+  # not after the first bad one.
+
   ai-attribution:
     # Re-runs scripts/scan-ai-attribution.sh against the PR's base so
     # attribution that slipped past (or around) the pre-push hook is
