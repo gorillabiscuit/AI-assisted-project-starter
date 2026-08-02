@@ -1,4 +1,30 @@
-# Per-vendor runbooks
+# Runbooks
+
+Two kinds live here: **per-vendor** runbooks (one page per third-party
+dependency) and **operational** runbooks (procedures we execute under
+pressure). Both exist for the same reason — the moment you need them is
+the worst moment to be improvising.
+
+## Operational runbooks
+
+Written _before_ the event they cover, not after. The baseline set every
+deployable project should have by first production deploy:
+
+- `rollback.md` — how to get production back to the last good version,
+  as exact commands. If rollback requires thinking, it isn't a rollback
+  procedure yet.
+- `secret-leak.md` — a credential hit a repo, a log, or a paste: which
+  keys exist (link each vendor runbook's rotation section), revocation
+  order, and how to verify the old credential is dead.
+- `incident.md` — the first 15 minutes: how to tell vendor failure from
+  our failure (link the vendor runbooks), where the logs and dashboards
+  are, what "degraded but operating" modes exist, who to inform.
+
+Same discipline as vendor pages: under ~100 lines, exact commands over
+prose, updated in the same PR as the change that invalidates them. A
+post-mortem that exposed a missing step ends with a commit to these files.
+
+## Per-vendor runbooks
 
 One page per third-party dependency. The point is not exhaustive vendor
 documentation — it's enough to answer three questions in a hurry:

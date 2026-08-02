@@ -3,6 +3,7 @@
 **This is Phase 1 work.** Walk through each entry below with the human, finalise as a real numbered ADR using `_template.md`, then commit. The order is roughly dependency order — earlier choices constrain later ones.
 
 Each entry below has:
+
 - The decision to make
 - A strawman recommendation (the previous-session Claude's or your own preliminary view)
 - The alternatives that were considered and why they're not the recommendation
@@ -33,6 +34,7 @@ Add one section per decision below. Suggested decisions for a typical web-app pr
 **Strawman:** plain pnpm workspaces (turbo or nx if build caching becomes a bottleneck).
 
 **Alternatives + why not:**
+
 - **turbo** — adds build caching across packages, but extra config + concept overhead.
 - **nx** — heavy / opinionated; valuable for large teams, overkill for solo.
 - **Yarn workspaces** — fine but pnpm is faster + stricter about phantom deps.
@@ -86,6 +88,37 @@ Add one section per decision below. Suggested decisions for a typical web-app pr
 ### Hosting platform
 
 `<...>`
+
+---
+
+### Deployment pipeline
+
+How code reaches staging and production, and what gates block it. Distinct from _hosting platform_ (where it runs): this decision is about the promotion path. The CI file ships with a commented skeleton of the pattern (`.github/workflows/ci.yml`, `deploy` block) — this ADR fills in the platform-specific steps.
+
+**Strawman:** staging deploys continuously from `main`; production deploys on a version tag through a GitHub `environment` with required approval; both depend on every gate job (preflight, dependency-audit, attribution). Rollback procedure written as a runbook (`docs/runbooks/`) before the first production deploy.
+
+**Alternatives + why not:**
+
+- **Deploy on merge to main straight to prod** — fine for a static site or throwaway; one bad merge is a production incident everywhere else.
+- **Manual deploys from a laptop** — unauditable, bus-factor-1, and skips the gates by construction.
+- **PR-preview environments from day one** — genuinely great, but platform-dependent effort; add when reviewing UI/API changes without pulling the branch becomes a real friction, not before.
+
+**Would change our mind:** a platform whose native flow already implements the pattern (e.g. Vercel's preview/production model) — then the ADR documents the mapping instead of building it.
+
+---
+
+### Secrets management
+
+Where credentials live in dev, CI, and production, and how they rotate. Deciding this late means secrets accrete in `.env` files and CI settings with no rotation story — and the first leaked key becomes an incident instead of a runbook.
+
+**Strawman:** local dev uses `.env` (gitignored) seeded from a committed `.env.example` that names every variable with a comment but never a value; CI uses the platform's secret store (GitHub Actions secrets); production uses the hosting platform's managed secret store — never baked into images or bundles. Every vendor credential gets a rotation procedure in its runbook (`docs/runbooks/`) at the moment the vendor is added.
+
+**Alternatives + why not:**
+
+- **A dedicated secrets manager from day one** (Vault, Doppler, AWS Secrets Manager) — right answer for multi-service or compliance-bound projects; ceremony without payoff for a two-package MVP. Graduate via this ADR when the trigger below fires.
+- **Encrypted secrets in the repo** (SOPS, git-crypt) — auditable and offline-friendly, but key distribution becomes its own problem and history rewrites on leak are brutal.
+
+**Would change our mind:** more than one deploy target consuming the same secrets, any compliance regime with rotation requirements, or the first near-miss.
 
 ---
 
